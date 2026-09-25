@@ -1,0 +1,82 @@
+-- ============================================================================
+-- PROPOSED (Step 12.10c) — refund_escrow_once hardening  [২০২৬-০৯-২১, live বডির ওপর]
+-- ⚠️ apply হয়নি (ব্যবহারকারীর "apply koro" আসেনি)। live md5 (apply-এর আগে): 7b9d7d2cb28064383d8542a402828a21, len 2195
+--   select md5(prosrc), length(prosrc), (prosrc ilike '%INVALID_REFUND_PERCENTAGE%') from pg_proc where oid='public.refund_escrow_once(text,text,numeric)'::regprocedure;
+--   -- মিলতে হবে: 7b9d7d2c…8a21 | 2195 | false — না মিললে থামো, বডি আবার টেনে diff করো।
+-- যোগ হচ্ছে (live বডির বাকি সব হুবহু):
+--   B: `if auth.uid() is null then raise 'NOT_AUTHORIZED'` — live-এ anon EXECUTE আছে ও auth-চেক NULL uid-তে NULL হয়ে পাশ হয়ে যায় (release_escrow-এর মতোই)।
+--   C: p_refund_percentage ০–১০০-র বাইরে/NULL হলে 'INVALID_REFUND_PERCENTAGE' — আগে >১০০ দিলে escrow-র চেয়ে বেশি টাকা user-এর balance-এ যেত।
+-- অপ্রভাবিত কলার (live যাচাইকৃত): SQL কলার ৫টা সবই ১০০ পাঠায় (admin_cancel_and_refund_direct_contract, resolve_dispute,
+--   solver_cancel_job, admin_reconcile_escrow_states, admin_update_direct_contract_status); client ০–১০০ clamp করে (`coerceIn`)।
+-- deposit_money_via_gateway: live-এ শুধু postgres/service_role EXECUTE (anon/authenticated নেই) → কিছু বদলানো হয়নি, প্রয়োজনও নেই।
+-- টেস্ট (rollback-নিশ্চিত DO, DDL সহ, ১০/১০ পাস, পরে live md5 অপরিবর্তিত ও ZZ_TEST সারি ০): no-JWT→NOT_AUTHORIZED; pct 150/-10/NULL→INVALID_REFUND_PERCENTAGE;
+--   অপরিচিত→NOT_AUTHORIZED; solver(cancel path,100)→OK (+100); owner 50→OK; admin 100→OK, পুনরায়→ALREADY_TERMINAL; owner 0→OK।
+-- ROLLBACK: B ও C ব্লক মুছে আবার create or replace (= md5 7b9d7d2c…8a21)। grants CREATE OR REPLACE-এ অপরিবর্তিত থাকে।
+-- ============================================================================
+CREATE OR REPLACE FUNCTION public.refund_escrow_once(p_escrow_id text, p_refund_type text DEFAULT 'SOLVER_CANCEL'::text, p_refund_percentage numeric DEFAULT 100)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare
+  v_escrow public.escrows%rowtype;
+  v_amount numeric(12,2);
+  v_trx_id text := 'TRX_REFUND_' || p_escrow_id;
+  v_now timestamptz := now();
+  v_user_has_role boolean;
+begin
+  -- [Step 12.10c — B] JWT ছাড়া (anon) কলার আটকানো: নিচের auth-চেক auth.uid() NULL হলে NULL হয়ে পাশ হয়ে যেত।
+  if auth.uid() is null then
+    raise exception 'NOT_AUTHORIZED';
+  end if;
+  -- [Step 12.10c — C] refund-শতাংশ ০–১০০-র বাইরে হলে বাতিল (>১০০ = escrow-র চেয়ে বেশি টাকা ফেরত/মিন্ট; <০ = উল্টো কর্তন; NULL = balance NULL)।
+  -- সব বৈধ কলার (SQL: ১০০; client: ০–১০০ clamp করা) অপ্রভাবিত।
+  if p_refund_percentage is null or p_refund_percentage < 0 or p_refund_percentage > 100 then
+    raise exception 'INVALID_REFUND_PERCENTAGE';
+  end if;
+
+  select * into v_escrow from public.escrows where id = p_escrow_id for update;
+  if not found then
+    raise exception 'ESCROW_NOT_FOUND';
+  end if;
+
+  if not (auth.uid() = v_escrow.user_id or auth.uid() = v_escrow.solver_id or public.is_admin(auth.uid())) then
+    raise exception 'NOT_AUTHORIZED';
+  end if;
+
+  if v_escrow.status in ('RELEASED', 'REFUNDED') then
+    return jsonb_build_object('result', 'ALREADY_TERMINAL', 'status', v_escrow.status);
+  end if;
+
+  if exists (select 1 from public.transactions where id = v_trx_id) then
+    return jsonb_build_object('result', 'ALREADY_REFUNDED');
+  end if;
+
+  select has_user_role into v_user_has_role from public.users where id = v_escrow.user_id for update;
+  if v_user_has_role is null then
+    raise exception 'USER_NOT_FOUND';
+  end if;
+  if not v_user_has_role then
+    raise exception 'USER_ROLE_INACTIVE';
+  end if;
+
+  v_amount := round((v_escrow.base_amount + v_escrow.extra_amount) * (p_refund_percentage / 100.0), 2);
+
+  update public.users set balance = balance + v_amount, balance_user = balance_user + v_amount, updated_at = v_now where id = v_escrow.user_id;
+
+  insert into public.transactions (id, problem_id, problem_title, user_id, solver_id, gross_amount,
+    net_amount, type, escrow_id, refund_type, refund_percentage, role, "timestamp")
+  values (v_trx_id, v_escrow.problem_id, v_escrow.problem_title, v_escrow.user_id, v_escrow.solver_id,
+    v_amount, v_amount, 'REFUND', p_escrow_id, p_refund_type, p_refund_percentage, 'USER', v_now);
+
+  update public.escrows set status = 'REFUNDED', released_at = v_now, updated_at = v_now where id = p_escrow_id;
+
+  insert into public.notifications (id, user_id, title, message, target_type, target_id, role, "timestamp")
+  values ('NOTIF_' || replace(gen_random_uuid()::text, '-', ''), v_escrow.user_id,
+    'রিফান্ড সম্পন্ন', 'আপনার ৳' || v_amount::text || ' রিফান্ড করা হয়েছে।', 'balance', v_escrow.user_id, 'USER', v_now);
+
+  return jsonb_build_object('result', 'OK', 'amount', v_amount);
+end;
+$function$
+;

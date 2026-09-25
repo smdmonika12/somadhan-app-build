@@ -1,0 +1,6 @@
+{
+  "name": "সমাধান",
+  "description": "বাংলাদেশ-কেন্দ্রিক হাইপারলোকাল প্রবলেম সলভিং মার্কেটপ্লেস",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

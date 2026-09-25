@@ -1,0 +1,37 @@
+-- সমাধান (Somadhan) — Wallet Deposit cloud sync silently fail ফিক্স
+-- (escrow_id FK constraint বাগ)
+--
+-- উপসর্গ: Wallet-এ deposit করলে local balance ঠিকই বাড়ে (Room DB), কিন্তু cloud-এ
+-- `balance_user`/`balance_solver` কখনো বাড়ে না (০-ই থাকে)। পরে role switch (User↔Solver)
+-- করে ফিরে এলে `switch_role_get_or_create_linked_profile` RPC cloud থেকে সেই (আপডেট-না-হওয়া)
+-- balance পড়ে local value **overwrite** করে দেয় — ফলে deposit করা টাকা "হারিয়ে যায়"।
+--
+-- Root cause (Supabase MCP দিয়ে সরাসরি RPC কল করে reproduce/verify করা হয়েছে):
+-- `request_wallet_deposit` RPC প্রতিবার এই error দিয়ে ব্যর্থ হচ্ছিল:
+--   ERROR: insert or update on table "transactions" violates foreign key constraint
+--   "transactions_escrow_id_fkey"
+--   DETAIL: Key (escrow_id)=(GWPAY_xxx) is not present in table "escrows".
+-- কারণ: `transactions.escrow_id` কলামটা আসলে একটা GENERIC reference field —
+-- escrow-linked transaction-এ (release_escrow, refund_escrow_once, accept_bid) real escrow
+-- id রাখে, কিন্তু wallet-deposit/withdrawal/dispute-split RPC-গুলোতে (request_wallet_deposit,
+-- request_withdrawal, resolve_dispute_split, admin_confirm_gateway_deposit ইত্যাদি) এই একই
+-- কলামে gateway_payments.id (GWPAY_xxx) বা অন্য non-escrow reference id বসানো হয় —
+-- ডিজাইন অনুযায়ীই। একে সবসময় `escrows(id)`-এর সাথে strict FK দিয়ে বাঁধে রাখাটা ভুল অনুমান
+-- ছিল, তাই এই RPC কল-গুলো প্রতিবার constraint violation দিয়ে পুরো transaction rollback করে
+-- ফেলছিল (balance আপডেটও rollback হয়ে যেত, একই RPC-এর ভেতরে দুটোই ঘটে বলে)। App-side এই
+-- ব্যর্থতা `SupabaseSyncManager.requestWalletDeposit(...)`-এর `.onFailure { Log.w(...) }`-এ
+-- silently ধরা পড়ত, তাই UI/local flow স্বাভাবিক দেখাত।
+--
+-- যাচাই: এই constraint drop করার আগে নিশ্চিত করা হয়েছে যে প্রজেক্টের কোনো view/RPC কোথাও
+-- `transactions.escrow_id`-কে `escrows.id`-এর সাথে join করে না (pure write-path validation
+-- ছিল, read-path-এ কোনো নির্ভরতা নেই) — তাই drop করাটা existing কোনো escrow-linked row বা
+-- ফিচার নষ্ট করে না, শুধু ভবিষ্যতে non-escrow reference id বসানো আটকাচ্ছিল সেটা বন্ধ করে।
+--
+-- ফিক্সের পর Supabase MCP দিয়ে সরাসরি `request_wallet_deposit` টেস্ট কল করে কনফার্ম করা
+-- হয়েছে: `{'result': 'OK', ...}` ফেরত এসেছে, test user-এর `balance_user` সঠিকভাবে বেড়েছে,
+-- আর `transactions` টেবিলে সঠিক row (escrow_id = GWPAY_xxx, type = WALLET_DEPOSIT) বসেছে।
+-- (টেস্ট ডেটা যাচাইয়ের পর পরিষ্কার করে দেওয়া হয়েছে — production data অক্ষত।)
+--
+-- app-side (`SomadhanRepository.kt`) কোনো কোড বদলানো হয়নি — শুধু cloud-side constraint ফিক্স।
+
+alter table public.transactions drop constraint transactions_escrow_id_fkey;

@@ -1,0 +1,21 @@
+-- সমাধান (Somadhan) — Supabase migration ধাপ ২০ (Realtime Foundation A)
+--
+-- users/problems/bids টেবিলে Postgres Changes (Realtime) enable করার জন্য। এই সেশনে
+-- Supabase MCP দিয়ে সরাসরি DB-তে গিয়ে যাচাই করা হয়েছে (`SELECT * FROM
+-- pg_publication_tables WHERE pubname = 'supabase_realtime'`) -- ফলাফল খালি, অর্থাৎ এই
+-- ৩টার (বা প্রজেক্টের অন্য কোনো টেবিলের) কোনোটাই এখনো `supabase_realtime` publication-এ
+-- যোগ করা হয়নি।
+--
+-- ⚠️ গুরুত্বপূর্ণ: এই ফাইলটা এই session-এ deploy/apply করা হয়নি (এই কাজের পরিবেশে
+-- network/Supabase dashboard access নেই -- পার্ট ২ এর গ্লোবাল নিয়ম #১৩ অনুযায়ী)।
+-- ব্যবহারকারীকে নিজে থেকে নিচের যেকোনো একভাবে এটা চালাতে হবে:
+--   ১. Supabase Dashboard -> SQL Editor -এ গিয়ে এই ফাইলের কনটেন্ট পেস্ট করে Run করা, অথবা
+--   ২. Supabase CLI থাকলে: এই ফাইলটা প্রজেক্টের `supabase/migrations/` ফোল্ডারে রেখে
+--      `supabase db push` চালানো।
+--
+-- Realtime enable করার পরেও RLS policy অক্ষত থাকবে -- অর্থাৎ কোনো authenticated ব্যবহারকারী
+-- RLS-এ তার জন্য visible না এমন row-এর change event পাবে না (বিস্তারিত:
+-- MIGRATION_PROGRESS.md-এ "ধাপ ২০" এন্ট্রি দেখুন, users/problems/bids-এর exact policy আলাদা
+-- করে লেখা আছে সেখানে)।
+
+ALTER PUBLICATION supabase_realtime ADD TABLE public.users, public.problems, public.bids;

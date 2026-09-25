@@ -1,0 +1,25 @@
+# সমাধান (Somadhan) — .gitignore
+# আগের ধাপগুলোতে flag করা ঝুঁকি ঠিক করতে যোগ করা হলো: .env এ আসল Supabase URL/anon key
+# (এবং MAPS_API_KEY/SMS_API_KEY/SENDGRID_API_KEY) আছে, এটা যেন কখনো commit না হয়।
+
+# Secrets — আসল key থাকে এখানে, কখনো commit হবে না
+.env
+*.keystore
+*.jks
+
+# Android / Gradle স্ট্যান্ডার্ড
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+
+# Android Studio
+*.hprof
+.navigation/

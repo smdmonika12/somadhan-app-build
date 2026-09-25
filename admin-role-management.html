@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>অ্যাডমিন রোল ম্যানেজমেন্ট — মকআপ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --orange: #FF6500;
+    --orange-pressed: #E65100;
+    --orange-light: #FFF3E0;
+    --orange-container: #FFE0B2;
+
+    --bg: #FFFFFF;
+    --surface: #FFFFFF;
+    --surface-variant: #F8F9FA;
+    --card-bg: #FAFAFA;
+    --divider: #E5E5E5;
+    --border: #E0E0E0;
+
+    --text-primary: #111111;
+    --text-secondary: #555555;
+    --text-hint: #9E9E9E;
+
+    --success: #10B981;
+    --success-light: #E8F5E9;
+    --error: #EF4444;
+    --error-light: #FFEBEE;
+    --info: #0284C7;
+    --info-light: #E0F2FE;
+
+    --admin-slate: #334155;
+    --admin-slate-light: #E2E8F0;
+
+    --radius-sm: 8px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #FFFFFF; --surface: #FFFFFF; --surface-variant: #F8F9FA; --card-bg: #FAFAFA;
+      --divider: #E5E5E5; --border: #E0E0E0; --text-primary: #111111; --text-secondary: #555555;
+      --text-hint: #9E9E9E;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0;
+    background: var(--surface-variant);
+    color: var(--text-primary);
+    font-family: 'Hind Siliguri', system-ui, sans-serif;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .page { max-width: 1240px; margin: 0 auto; padding: 20px 16px 48px; }
+
+  .intro {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    margin-bottom: 18px;
+  }
+  .intro h1 { font-size: 19px; font-weight: 700; margin: 0 0 4px; }
+  .intro .sub { font-size: 13px; color: var(--text-hint); margin: 0 0 10px; }
+  .intro p { font-size: 13.5px; color: var(--text-secondary); line-height: 1.65; margin: 0; }
+  .intro p + p { margin-top: 6px; }
+  .intro b { color: var(--text-primary); }
+
+  .layout { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  @media (min-width: 960px) {
+    .layout { grid-template-columns: minmax(0,1fr) 360px; align-items: start; }
+    .preview-col { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 12px; }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .tabs { display: flex; gap: 4px; padding: 10px; border-bottom: 1px solid var(--divider); background: var(--surface); }
+  .tab-btn {
+    flex: 1; border: none; background: transparent; cursor: pointer;
+    font-family: inherit; font-size: 13.5px; font-weight: 600; color: var(--text-secondary);
+    padding: 10px 8px; border-radius: var(--radius-sm); transition: background .15s, color .15s;
+  }
+  .tab-btn.active { background: var(--orange-light); color: var(--orange-pressed); }
+  .tab-btn:not(.active):hover { background: var(--surface-variant); }
+
+  .panel-body { padding: 16px; }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .panel-head h2 { font-size: 15.5px; font-weight: 700; margin: 0; }
+  .panel-head .count { font-size: 12px; color: var(--text-hint); }
+
+  .btn {
+    font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+    border-radius: var(--radius-sm); padding: 9px 14px; border: 1px solid transparent;
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  }
+  .btn-primary { background: var(--orange); color: #fff; }
+  .btn-primary:hover { background: var(--orange-pressed); }
+  .btn-ghost { background: transparent; color: var(--text-secondary); border-color: var(--border); }
+  .btn-ghost:hover { background: var(--surface-variant); }
+  .btn-danger-ghost { background: transparent; color: var(--error); border-color: var(--error-light); }
+  .btn-danger-ghost:hover { background: var(--error-light); }
+  .btn-sm { padding: 6px 10px; font-size: 12px; }
+  .btn:disabled {
+    background: var(--surface-variant) !important; color: var(--text-hint) !important;
+    border-color: var(--border) !important; cursor: not-allowed;
+  }
+
+  .role-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px,1fr)); gap: 10px; }
+  .role-card {
+    border: 1px solid var(--border); border-radius: var(--radius-md); padding: 13px 14px;
+    background: var(--card-bg); cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .role-card:hover { border-color: var(--orange); background: var(--orange-light); }
+  .role-card.previewing { border-color: var(--orange); box-shadow: 0 0 0 1px var(--orange) inset; }
+  .role-card.locked { background: var(--admin-slate-light); }
+  .role-card.locked:hover { border-color: var(--admin-slate); background: var(--admin-slate-light); }
+  .role-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .role-name { font-size: 14px; font-weight: 700; margin: 0 0 2px; }
+  .role-desc { font-size: 12px; color: var(--text-secondary); margin: 0 0 10px; line-height: 1.5; min-height: 32px; }
+  .badge {
+    font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+  }
+  .badge-orange { background: var(--orange-container); color: var(--orange-pressed); }
+  .badge-slate { background: var(--admin-slate-light); color: var(--admin-slate); }
+  .role-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+  .role-users { font-size: 11.5px; color: var(--text-hint); }
+  .role-actions { display: flex; gap: 6px; margin-top: 10px; }
+
+  .editor { border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); }
+  .editor-head { padding: 14px; border-bottom: 1px solid var(--divider); }
+  .editor-head input {
+    width: 100%; font-family: inherit; font-size: 15px; font-weight: 700; color: var(--text-primary);
+    border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 11px; background: var(--surface);
+  }
+  .editor-head input:focus { outline: none; border-color: var(--orange); }
+  .editor-head .label { font-size: 11.5px; color: var(--text-hint); margin: 0 0 6px; font-weight: 600; }
+  .editor-note { font-size: 11.5px; color: var(--text-hint); margin-top: 8px; line-height: 1.5; }
+
+  .tree { max-height: 480px; overflow-y: auto; }
+
+  .group-block { border-bottom: 1px solid var(--divider); }
+  .group-block:last-child { border-bottom: none; }
+  .group-block.locked-group { background: var(--surface-variant); }
+  .row-top { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; }
+  .row-left { display: flex; align-items: center; gap: 9px; min-width: 0; }
+  .group-title { font-size: 13px; font-weight: 700; }
+  .group-count { font-size: 11px; color: var(--text-hint); }
+  .chev { color: var(--text-hint); transition: transform .15s; font-size: 11px; cursor: pointer; flex-shrink: 0; padding: 4px; }
+  .chev.open { transform: rotate(180deg); }
+  .locked-note { font-size: 11px; color: var(--text-hint); font-style: normal; }
+
+  input[type=checkbox] {
+    width: 17px; height: 17px; accent-color: var(--orange); cursor: pointer; flex-shrink: 0;
+  }
+
+  .items-wrap { display: none; padding: 0 0 4px 20px; border-left: 2px solid var(--divider); margin: 0 14px 8px 20px; }
+  .items-wrap.open { display: block; }
+
+  .item-block { border-bottom: 1px dashed var(--divider); }
+  .item-block:last-child { border-bottom: none; }
+  .item-row-top { display: flex; align-items: center; justify-content: space-between; padding: 8px 6px 8px 2px; }
+  .item-name { font-size: 12.5px; font-weight: 600; }
+  .item-count { font-size: 10.5px; color: var(--text-hint); }
+
+  .actions-wrap { display: none; padding: 2px 0 8px 24px; }
+  .actions-wrap.open { display: block; }
+  .select-all-row {
+    display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+    padding: 4px 0 6px; margin-bottom: 4px; border-bottom: 1px dashed var(--divider);
+  }
+  .select-all-link { font-size: 11.5px; font-weight: 700; color: var(--orange); }
+  .select-all-row:hover .select-all-link { color: var(--orange-pressed); text-decoration: underline; }
+  .select-all-count { font-size: 10.5px; color: var(--text-hint); }
+  .action-row { display: flex; align-items: center; gap: 9px; padding: 5px 0; font-size: 12px; cursor: pointer; }
+  .action-row label { cursor: pointer; flex: 1; color: var(--text-secondary); }
+  .action-row.view-action label { color: var(--text-primary); font-weight: 600; }
+
+  .editor-footer {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 12px 14px; background: var(--surface-variant); flex-wrap: wrap;
+  }
+  .editor-footer .sel-count { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
+  .editor-footer .btns { display: flex; gap: 8px; }
+
+  .acc-list { display: flex; flex-direction: column; gap: 8px; }
+  .acc-row {
+    display: flex; align-items: center; gap: 10px; border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 11px 12px; background: var(--card-bg);
+    cursor: pointer; transition: border-color .15s; flex-wrap: wrap;
+  }
+  .acc-row:hover, .acc-row.previewing { border-color: var(--orange); }
+  .acc-row.flagged { border-color: #F5B5B5; background: var(--error-light); }
+  .flag-tag { font-size: 10px; font-weight: 700; color: #B3261E; }
+  .avatar {
+    width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0; color: var(--admin-slate); background: var(--admin-slate-light);
+  }
+  .avatar.super { background: var(--orange-container); color: var(--orange-pressed); }
+  .acc-info { flex: 1; min-width: 0; }
+  .acc-name { font-size: 13.5px; font-weight: 700; margin: 0; }
+  .acc-phone { font-size: 12px; color: var(--text-hint); margin: 1px 0 0; }
+  .acc-role-badge { font-size: 11px; }
+  .status-pill {
+    font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; flex-shrink: 0;
+  }
+  .status-active { background: var(--success-light); color: #0B7A4B; }
+  .status-inactive { background: var(--error-light); color: #B3261E; }
+  .status-locked { cursor: default; opacity: .9; }
+
+  .new-acc-form {
+    border: 1px dashed var(--border); border-radius: var(--radius-md); padding: 13px;
+    display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 12px;
+    background: var(--surface-variant);
+  }
+  @media (min-width: 560px) { .new-acc-form { grid-template-columns: 1fr 1fr 1fr auto; align-items: end; } }
+  .field label { display: block; font-size: 11px; color: var(--text-hint); font-weight: 600; margin-bottom: 4px; }
+  .field input, .field select {
+    width: 100%; font-family: inherit; font-size: 13px; padding: 8px 10px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); background: var(--surface); color: var(--text-primary);
+  }
+  .field input:focus, .field select:focus { outline: none; border-color: var(--orange); }
+
+  .preview-phone {
+    border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); overflow: hidden;
+  }
+  .preview-topbar {
+    background: var(--orange); color: #fff; padding: 12px 14px; display: flex; align-items: center; gap: 10px;
+  }
+  .preview-topbar .ptitle { font-size: 13px; font-weight: 700; }
+  .preview-topbar .psub { font-size: 10.5px; opacity: .9; }
+  .preview-who {
+    padding: 11px 14px; border-bottom: 1px solid var(--divider); display: flex; align-items: center; gap: 10px;
+    background: var(--surface-variant);
+  }
+  .preview-who .txt { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+  .preview-who .txt b { color: var(--text-primary); font-size: 13px; }
+  .preview-menu { max-height: 300px; overflow-y: auto; padding: 4px 0; }
+  .pm-group { padding: 3px 0; }
+  .pm-group-title {
+    font-size: 10.5px; font-weight: 700; color: var(--text-hint); padding: 6px 14px 2px; letter-spacing: .2px;
+  }
+  .pm-item { padding: 6px 14px; cursor: pointer; }
+  .pm-item-head { display: flex; align-items: center; gap: 9px; font-size: 12.5px; }
+  .pm-item.allowed .pm-item-head { color: var(--text-primary); }
+  .pm-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: var(--success); }
+  .pm-actions { padding: 4px 0 2px 15px; display: flex; flex-wrap: wrap; gap: 4px; }
+  .pm-chip { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 999px; background: var(--success-light); color: #0B7A4B; }
+  .pm-chip.denied { background: var(--surface-variant); color: var(--text-hint); text-decoration: line-through; }
+  .preview-empty { padding: 24px 16px; text-align: center; font-size: 12.5px; color: var(--text-hint); }
+  .preview-flag-banner {
+    margin: 8px 14px; font-size: 11px; font-weight: 600; color: #B3261E; background: var(--error-light);
+    border: 1px solid #F5B5B5; border-radius: var(--radius-sm); padding: 7px 10px; line-height: 1.5;
+  }
+  .preview-foot {
+    border-top: 1px solid var(--divider); padding: 9px 14px; font-size: 10.5px; color: var(--text-hint);
+    background: var(--surface-variant); line-height: 1.5;
+  }
+
+  .sim-card { padding: 14px; }
+  .sim-title { font-size: 12.5px; font-weight: 700; margin: 0 0 3px; }
+  .sim-sub { font-size: 11px; color: var(--text-hint); margin: 0 0 12px; line-height: 1.5; }
+  .sim-row {
+    border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px; background: var(--card-bg);
+  }
+  .sim-user-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .sim-user-name { font-size: 12.5px; font-weight: 700; margin: 0; }
+  .sim-user-meta { font-size: 10.5px; color: var(--text-hint); margin: 1px 0 0; }
+  .sim-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+  .sim-locked {
+    text-align: center; padding: 18px 10px; font-size: 12px; color: var(--text-hint);
+    border: 1px dashed var(--border); border-radius: var(--radius-md); background: var(--surface-variant);
+  }
+
+  .super-only-note {
+    font-size: 12px; color: var(--admin-slate); background: var(--admin-slate-light);
+    border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px 12px;
+    line-height: 1.6; margin: 0 0 14px;
+  }
+  .log-filter-bar {
+    display: flex; align-items: end; gap: 10px; flex-wrap: wrap;
+    border: 1px dashed var(--border); border-radius: var(--radius-md); padding: 12px;
+    background: var(--surface-variant); margin-bottom: 14px;
+  }
+  .log-list { display: flex; flex-direction: column; gap: 8px; }
+  .log-row {
+    border: 1px solid var(--border); border-radius: var(--radius-md); padding: 11px 13px;
+    background: var(--card-bg); display: flex; gap: 11px; align-items: flex-start;
+  }
+  .log-body { flex: 1; min-width: 0; }
+  .log-headline-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .log-headline { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-size: 13.5px; font-weight: 700; margin: 0; }
+  .log-headline .who { color: var(--text-primary); }
+  .log-role-badge { font-size: 10px; padding: 2.5px 8px; }
+  .log-time { font-size: 11px; color: var(--text-hint); white-space: nowrap; margin-top: 2px; }
+  .log-icon-row { display: flex; align-items: center; gap: 7px; margin-top: 6px; }
+  .log-icon { font-size: 13px; flex-shrink: 0; }
+  .log-action { font-size: 12.5px; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+  .log-action .target { color: var(--text-primary); font-weight: 600; }
+  .log-reason { font-size: 12px; color: var(--text-secondary); margin-top: 5px; padding-left: 20px; line-height: 1.5; }
+  .log-reason b { color: var(--text-primary); font-weight: 600; }
+  .log-empty {
+    text-align: center; padding: 30px 10px; font-size: 12.5px; color: var(--text-hint);
+    border: 1px dashed var(--border); border-radius: var(--radius-md); background: var(--surface-variant);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="intro">
+    <h1>অ্যাডমিন রোল ম্যানেজমেন্ট</h1>
+    <p class="sub">মকআপ — বর্তমান অ্যাপ ডিজাইন সিস্টেম (Somadhan) অনুসরণ করে তৈরি</p>
+    <p>প্রতিটা মেনুর ভেতরের আলাদা আলাদা ফাংশনের (যেমন <b>ইউজারগণ</b> মেনুতে "ব্যান করা") জন্য আলাদা পারমিশন থাকবে। কোনো রোলে "ব্যান" পারমিশন না থাকলে সেই রোলের অ্যাডমিন ইউজার লিস্ট দেখতে পারবে, কিন্তু ব্যান করার বাটনটাই পাবে না।</p>
+    <p>নিচে গ্রুপ → মেনু → নির্দিষ্ট ফাংশন — তিন স্তরে টিক দিন। ডানে লাইভ প্রিভিউ ও "ইউজারগণ" স্ক্রিনের বাটন-লেভেল সিমুলেশন দেখুন।</p>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="card">
+        <div class="tabs">
+          <button class="tab-btn active" id="tabBtnRoles" onclick="switchTab('roles')">রোল সমূহ</button>
+          <button class="tab-btn" id="tabBtnAccounts" onclick="switchTab('accounts')">এডমিন অ্যাকাউন্ট</button>
+          <button class="tab-btn" id="tabBtnActivity" onclick="switchTab('activity')">🔒 অ্যাক্টিভিটি লগ</button>
+        </div>
+
+        <div class="panel-body" id="viewRoles">
+          <div class="panel-head">
+            <h2>সব রোল</h2>
+            <button class="btn btn-primary" onclick="openEditor(null)">+ নতুন রোল</button>
+          </div>
+          <div class="role-grid" id="roleGrid"></div>
+
+          <div id="editorWrap" style="display:none; margin-top:14px;"></div>
+        </div>
+
+        <div class="panel-body" id="viewAccounts" style="display:none;">
+          <div class="panel-head">
+            <h2>এডমিন অ্যাকাউন্ট</h2>
+            <span class="count" id="accCount"></span>
+          </div>
+          <div class="new-acc-form">
+            <div class="field"><label>নাম</label><input id="newAccName" placeholder="যেমন: রাফি হোসেন"></div>
+            <div class="field"><label>ফোন নম্বর</label><input id="newAccPhone" placeholder="017XXXXXXXX"></div>
+            <div class="field"><label>রোল</label><select id="newAccRole"></select></div>
+            <button class="btn btn-primary" onclick="addAccount()">+ যোগ করুন</button>
+          </div>
+          <div class="acc-list" id="accList"></div>
+        </div>
+
+        <div class="panel-body" id="viewActivity" style="display:none;">
+          <div class="panel-head">
+            <h2>অ্যাডমিন অ্যাক্টিভিটি লগ</h2>
+            <span class="count" id="logCount"></span>
+          </div>
+          <p class="super-only-note">🔒 এই ট্যাবটি শুধুমাত্র <b>সুপার অ্যাডমিন</b> দেখতে পাবেন। অন্য যেকোনো রোলের অ্যাডমিন — ব্যান, রেস্ট্রিক্ট, রোল পরিবর্তন, ডিলিট ইত্যাদি সংবেদনশীল কাজ করলে সেটা এখানে কে (নাম ও রোলসহ), কখন, কী করেছেন ও কেন করেছেন — টাইমস্ট্যাম্পসহ রেকর্ড হয়ে থাকবে। নিচে একজন নির্দিষ্ট অ্যাডমিনের নাম দিয়ে সার্চ বা তালিকা থেকে বেছে নিয়ে শুধু তার সব অ্যাক্টিভিটি ফিল্টার করে দেখা যাবে।</p>
+
+          <div class="log-filter-bar">
+            <div class="field" style="flex:1; min-width:180px;">
+              <label>অ্যাডমিনের নাম দিয়ে সার্চ</label>
+              <input id="logSearchInput" placeholder="যেমন: সুমাইয়া আক্তার" onkeydown="if(event.key==='Enter') applyLogFilter()">
+            </div>
+            <div class="field" style="width:220px;">
+              <label>অথবা তালিকা থেকে বেছে নিন</label>
+              <select id="logAdminSelect"><option value="">সব অ্যাডমিন</option></select>
+            </div>
+            <button class="btn btn-primary" onclick="applyLogFilter()">ফিল্টার করুন</button>
+            <button class="btn btn-ghost" onclick="clearLogFilter()">রিসেট</button>
+          </div>
+
+          <div class="log-list" id="logList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview-col">
+      <div class="preview-phone">
+        <div class="preview-topbar">
+          <div>
+            <div class="ptitle">সমাধান অ্যাডমিন প্যানেল</div>
+            <div class="psub">লাইভ প্রিভিউ</div>
+          </div>
+        </div>
+        <div class="preview-who" id="previewWho"></div>
+        <div class="preview-menu" id="previewMenu"></div>
+        <div class="preview-foot">মেনুর নামে ক্লিক করে সেই মেনুর ভেতরের কোন কোন ফাংশন খোলা আছে দেখুন।</div>
+      </div>
+
+      <div class="card sim-card">
+        <p class="sim-title">লাইভ স্ক্রিন সিমুলেশন — ইউজারগণ</p>
+        <p class="sim-sub">এই রোলের অ্যাডমিন "ইউজারগণ" স্ক্রিনে ঢুকলে ঠিক এই বাটনগুলোই সক্রিয় পাবে।</p>
+        <div id="usersSim"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const A = {
+  view:'দেখুন', create:'তৈরি করুন', edit:'এডিট করুন', delete:'মুছে ফেলুন',
+  ban:'ব্যান / আনব্যান', restrict:'রেস্ট্রিক্ট করুন', balance_adjust:'ব্যালেন্স এডজাস্ট',
+  score_adjust:'স্কোর এডজাস্ট', change_role:'রোল পরিবর্তন', approve:'অনুমোদন করুন',
+  reject:'বাতিল / রিজেক্ট', revoke:'রিভোক করুন', reset_quota:'কোটা রিসেট',
+  cancel:'বাতিল করুন', reconcile:'রিকনসাইল করুন', mark_settled:'সেটলড মার্ক করুন',
+  close:'বন্ধ করুন', send:'প্রেরণ করুন', hide:'লুকান', query:'কুয়েরি চালান', run_fix:'ফিক্স রান করুন'
+};
+function act(...ids){ return ids.map(id => ({id, label:A[id]})); }
+
+const GROUPS = [
+  { id:'dashboard', title:'ড্যাশবোর্ড', items:[
+    {id:'stats', label:'পরিসংখ্যান ও চার্ট', actions:act('view')}
+  ]},
+  { id:'users', title:'ইউজার ব্যবস্থাপনা', items:[
+    {id:'user_search', label:'ইউজার/সলভার সার্চ', actions:act('view')},
+    {id:'solver_quota', label:'সলভার কোটা', actions:act('view','reset_quota')},
+    {id:'users', label:'ইউজারগণ', actions:act('view','ban','restrict','balance_adjust','score_adjust','change_role','delete')},
+    {id:'kyc', label:'কেওয়াইসি', actions:act('view','approve','reject','revoke')},
+    {id:'activity_log', label:'অ্যাক্টিভিটি লগ', actions:act('view')}
+  ]},
+  { id:'work', title:'কাজ ও চুক্তি', items:[
+    {id:'problems', label:'সমস্যাসমূহ', actions:act('view','delete')},
+    {id:'instant_jobs', label:'জরুরি / ইনস্ট্যান্ট জবস', actions:act('view','cancel')},
+    {id:'cancelled_bids', label:'বিড বাতিলের ইতিহাস', actions:act('view')},
+    {id:'direct_contracts', label:'সরাসরি চুক্তি প্রজেক্ট', actions:act('view','edit')},
+    {id:'chat_monitoring', label:'চ্যাট মনিটরিং', actions:act('view')}
+  ]},
+  { id:'finance', title:'আর্থিক ব্যবস্থাপনা', items:[
+    {id:'withdrawals', label:'উইথড্রয়াল', actions:act('view','approve','reject','delete')},
+    {id:'escrow', label:'Escrow', actions:act('view','reconcile')},
+    {id:'extra_charges', label:'অতিরিক্ত চার্জ', actions:act('view','mark_settled')},
+    {id:'transactions', label:'লেনদেন হিস্ট্রি', actions:act('view')},
+    {id:'gateway_payments', label:'অনলাইন গেটওয়ে লেনদেন', actions:act('view')}
+  ]},
+  { id:'config', title:'কনফিগারেশন', items:[
+    {id:'categories', label:'ক্যাটাগরি', actions:act('view','create','edit','close','delete')},
+    {id:'reputation', label:'রেপুটেশন ইঞ্জিন', actions:act('view','edit')},
+    {id:'settings', label:'সেটিংস', actions:act('view','edit')},
+    {id:'faq', label:'FAQ ম্যানেজমেন্ট', actions:act('view','create','edit','delete')}
+  ]},
+  { id:'disputes', title:'বিরোধ ব্যবস্থাপনা', items:[
+    {id:'dispute_center', label:'বিরোধ কেন্দ্র', actions:act('view','resolve_split')}
+  ]},
+  { id:'contact', title:'যোগাযোগ', items:[
+    {id:'notifications', label:'বিজ্ঞপ্তি প্রেরণ', actions:act('view','send')}
+  ]},
+  { id:'moderation', title:'মডারেশন', items:[
+    {id:'reviews', label:'রিভিউ মডারেশন', actions:act('view','hide','delete')}
+  ]},
+  { id:'system', title:'সিস্টেম / অ্যাডভান্সড', items:[
+    {id:'explorer', label:'Supabase ডাটা এক্সপ্লোরার', actions:act('view','query')},
+    {id:'refund_debug', label:'রিফান্ড ডায়াগনস্টিক (Debug)', actions:act('view','run_fix')}
+  ]},
+  { id:'admin_mgmt', title:'অ্যাডমিন ব্যবস্থাপনা', superOnly:true, items:[
+    {id:'role_mgmt', label:'রোল ম্যানেজমেন্ট', actions:act('view','create','edit','delete')},
+    {id:'admin_accounts', label:'এডমিন অ্যাকাউন্ট', actions:act('view','create','edit','delete')},
+    {id:'activity_log', label:'অ্যাডমিন অ্যাক্টিভিটি লগ', actions:act('view')}
+  ]}
+];
+
+function allKeys(){
+  const out = [];
+  GROUPS.forEach(g => g.items.forEach(i => i.actions.forEach(a => out.push(g.id+':'+i.id+':'+a.id))));
+  return out;
+}
+function nonSuperKeys(){
+  const out = [];
+  GROUPS.filter(g=>!g.superOnly).forEach(g => g.items.forEach(i => i.actions.forEach(a => out.push(g.id+':'+i.id+':'+a.id))));
+  return out;
+}
+function findItem(gid, iid){
+  const g = GROUPS.find(x=>x.id===gid);
+  return g.items.find(i=>i.id===iid);
+}
+
+function permsFrom(list){ return new Set(list.map(([g,i,a]) => g+':'+i+':'+a)); }
+
+let roles = [
+  { id:'super', name:'সুপার অ্যাডমিন', desc:'সব ফাংশনে সম্পূর্ণ অ্যাক্সেস। এই রোল এডিট করা যায় না।', locked:true, perms: new Set(allKeys()) },
+  { id:'kyc', name:'কেওয়াইসি ম্যানেজার', desc:'ইউজার যাচাই দেখে, কিন্তু ব্যান/ব্যালেন্স ছোঁয় না।', locked:false,
+    perms: permsFrom([
+      ['users','user_search','view'],
+      ['users','users','view'],
+      ['users','kyc','view'],['users','kyc','approve'],['users','kyc','reject'],['users','kyc','revoke'],
+      ['users','activity_log','view']
+    ]) },
+  { id:'finance', name:'ফাইন্যান্স অফিসার', desc:'উইথড্রয়াল, এস্ক্রো ও লেনদেন ব্যবস্থাপনার দায়িত্বে।', locked:false,
+    perms: permsFrom([
+      ['dashboard','stats','view'],
+      ['finance','withdrawals','view'],['finance','withdrawals','approve'],['finance','withdrawals','reject'],['finance','withdrawals','delete'],
+      ['finance','escrow','view'],['finance','escrow','reconcile'],
+      ['finance','extra_charges','view'],['finance','extra_charges','mark_settled'],
+      ['finance','transactions','view'],
+      ['finance','gateway_payments','view']
+    ]) },
+  { id:'support', name:'সাপোর্ট এজেন্ট', desc:'চ্যাট মনিটরিং, বিজ্ঞপ্তি ও FAQ দেখভাল করে।', locked:false,
+    perms: permsFrom([
+      ['work','chat_monitoring','view'],
+      ['contact','notifications','view'],['contact','notifications','send'],
+      ['config','faq','view'],['config','faq','create'],['config','faq','edit'],['config','faq','delete'],
+      ['moderation','reviews','view'],['moderation','reviews','hide'],['moderation','reviews','delete']
+    ]) }
+];
+
+let accounts = [
+  { id:1, name:'প্রধান অ্যাডমিন', phone:'01700000000', roleId:'super', active:true, flagged:false },
+  { id:2, name:'সুমাইয়া আক্তার', phone:'01812345678', roleId:'kyc', active:true, flagged:false },
+  { id:3, name:'রাকিব হাসান', phone:'01911223344', roleId:'finance', active:true, flagged:false },
+  { id:4, name:'তানভীর আহমেদ', phone:'01655667788', roleId:'support', active:false, flagged:false }
+];
+
+let editingRoleId = null;
+let editingPerms = null;
+let openGroups = new Set();
+let openItems = new Set();
+let previewRoleId = 'super';
+let previewAccountId = null;
+let previewOpenMenus = new Set();
+let nextAccId = 5;
+
+function roleById(id){ return roles.find(r=>r.id===id); }
+function countUsers(roleId){ return accounts.filter(a=>a.roleId===roleId).length; }
+
+function switchTab(tab){
+  document.getElementById('viewRoles').style.display = tab==='roles' ? '' : 'none';
+  document.getElementById('viewAccounts').style.display = tab==='accounts' ? '' : 'none';
+  document.getElementById('viewActivity').style.display = tab==='activity' ? '' : 'none';
+  document.getElementById('tabBtnRoles').classList.toggle('active', tab==='roles');
+  document.getElementById('tabBtnAccounts').classList.toggle('active', tab==='accounts');
+  document.getElementById('tabBtnActivity').classList.toggle('active', tab==='activity');
+  if(tab==='accounts') renderAccounts();
+  if(tab==='activity') renderActivityLog();
+}
+
+function renderRoleGrid(){
+  const grid = document.getElementById('roleGrid');
+  grid.innerHTML = '';
+  const total = nonSuperKeys().length;
+  roles.forEach(role => {
+    const permCount = role.locked ? total : [...role.perms].filter(k=>!k.startsWith('admin_mgmt:')).length;
+    const card = document.createElement('div');
+    card.className = 'role-card' + (role.id===previewRoleId ? ' previewing' : '') + (role.locked ? ' locked' : '');
+    card.onclick = (e) => { if(e.target.closest('button')) return; setPreview(role.id); };
+    card.innerHTML = `
+      <div class="role-card-top">
+        <div><p class="role-name">${role.name}</p></div>
+        <span class="badge ${role.locked ? 'badge-slate' : 'badge-orange'}">${role.locked ? 'মূল অ্যাডমিন' : permCount + '/' + total + ' পারমিশন'}</span>
+      </div>
+      <p class="role-desc">${role.desc}</p>
+      <div class="role-meta"><span class="role-users">ব্যবহারকারী: ${countUsers(role.id)} জন</span></div>
+      <div class="role-actions">
+        ${role.locked ? '' : `<button class="btn btn-ghost btn-sm" onclick="openEditor('${role.id}')">এডিট</button>
+        <button class="btn btn-danger-ghost btn-sm" onclick="deleteRole('${role.id}')">মুছুন</button>`}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function deleteRole(id){
+  if(countUsers(id) > 0){ alert('এই রোলে এখনও অ্যাডমিন যুক্ত আছে — আগে তাদের অন্য রোলে সরান।'); return; }
+  roles = roles.filter(r=>r.id!==id);
+  if(previewRoleId===id) previewRoleId = 'super';
+  renderRoleGrid(); renderPreview(); populateRoleSelect();
+}
+
+function openEditor(roleId){
+  editingRoleId = roleId;
+  const existing = roleId ? roleById(roleId) : null;
+  editingPerms = new Set(existing ? existing.perms : []);
+  openGroups = new Set(['users']);
+  openItems = new Set(['users']);
+  renderEditor();
+  document.getElementById('editorWrap').style.display = '';
+  document.getElementById('editorWrap').scrollIntoView({behavior:'smooth', block:'nearest'});
+  renderLivePreviewFromEditor();
+}
+
+function closeEditor(){
+  editingRoleId = null; editingPerms = null;
+  document.getElementById('editorWrap').style.display = 'none';
+  document.getElementById('editorWrap').innerHTML = '';
+  renderPreview();
+}
+
+function toggleGroupOpen(gid){
+  if(openGroups.has(gid)) openGroups.delete(gid); else openGroups.add(gid);
+  renderEditor();
+}
+function toggleItemOpen(gid, iid){
+  const key = gid+':'+iid;
+  if(openItems.has(key)) openItems.delete(key); else openItems.add(key);
+  renderEditor();
+}
+
+function itemFull(g, item){ return item.actions.every(a => editingPerms.has(g.id+':'+item.id+':'+a.id)); }
+function itemPartial(g, item){ return item.actions.some(a => editingPerms.has(g.id+':'+item.id+':'+a.id)) && !itemFull(g,item); }
+function groupFull(g){ return g.items.every(i => itemFull(g,i)); }
+function groupPartial(g){ return g.items.some(i => i.actions.some(a=>editingPerms.has(g.id+':'+i.id+':'+a.id))) && !groupFull(g); }
+
+function toggleGroupAll(gid){
+  const g = GROUPS.find(x=>x.id===gid);
+  const full = groupFull(g);
+  g.items.forEach(i => i.actions.forEach(a => {
+    const key = gid+':'+i.id+':'+a.id;
+    if(full) editingPerms.delete(key); else editingPerms.add(key);
+  }));
+  renderEditor(); renderLivePreviewFromEditor();
+}
+function toggleItemAll(gid, iid){
+  const g = GROUPS.find(x=>x.id===gid);
+  const item = findItem(gid, iid);
+  const full = itemFull(g, item);
+  item.actions.forEach(a => {
+    const key = gid+':'+iid+':'+a.id;
+    if(full) editingPerms.delete(key); else editingPerms.add(key);
+  });
+  renderEditor(); renderLivePreviewFromEditor();
+}
+function toggleAction(gid, iid, aid){
+  const key = gid+':'+iid+':'+aid;
+  if(editingPerms.has(key)) editingPerms.delete(key); else editingPerms.add(key);
+  renderEditor(); renderLivePreviewFromEditor();
+}
+
+function renderEditor(){
+  const wrap = document.getElementById('editorWrap');
+  const nameVal = editingRoleId ? roleById(editingRoleId).name : '';
+  const selCount = [...editingPerms].filter(k=>!k.startsWith('admin_mgmt:')).length;
+  const total = nonSuperKeys().length;
+
+  let groupsHtml = '';
+  GROUPS.forEach(g => {
+    const gOpen = openGroups.has(g.id);
+    if(g.superOnly){
+      groupsHtml += `
+        <div class="group-block locked-group">
+          <div class="row-top">
+            <div class="row-left">
+              <span style="width:17px;text-align:center;">🔒</span>
+              <div>
+                <div class="group-title">${g.title}</div>
+                <div class="locked-note">শুধু সুপার অ্যাডমিন — কোনো রোলে বরাদ্দযোগ্য নয়</div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      return;
+    }
+    const gFull = groupFull(g), gPartial = groupPartial(g);
+    const selInGroup = g.items.reduce((n,i)=> n + i.actions.filter(a=>editingPerms.has(g.id+':'+i.id+':'+a.id)).length, 0);
+    const totalInGroup = g.items.reduce((n,i)=> n + i.actions.length, 0);
+
+    let itemsHtml = '';
+    g.items.forEach(item => {
+      const iOpen = openItems.has(g.id+':'+item.id);
+      const iFull = itemFull(g,item), iPartial = itemPartial(g,item);
+      const selInItem = item.actions.filter(a=>editingPerms.has(g.id+':'+item.id+':'+a.id)).length;
+      itemsHtml += `
+        <div class="item-block">
+          <div class="item-row-top">
+            <div class="row-left">
+              <input type="checkbox" ${iFull?'checked':''} data-indet="${iPartial}" onclick="toggleItemAll('${g.id}','${item.id}')">
+              <span class="item-name" style="cursor:pointer;" onclick="toggleItemOpen('${g.id}','${item.id}')">${item.label}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="item-count">${selInItem}/${item.actions.length}</span>
+              <span class="chev ${iOpen?'open':''}" onclick="toggleItemOpen('${g.id}','${item.id}')">▾</span>
+            </div>
+          </div>
+          <div class="actions-wrap ${iOpen?'open':''}">
+            <div class="select-all-row" onclick="toggleItemAll('${g.id}','${item.id}')">
+              <span class="select-all-link">${iFull ? 'সব বাতিল করুন' : 'সব নির্বাচন করুন'}</span>
+              <span class="select-all-count">${selInItem}/${item.actions.length}</span>
+            </div>
+            ${item.actions.map(a => `
+              <div class="action-row ${a.id==='view'?'view-action':''}" onclick="toggleAction('${g.id}','${item.id}','${a.id}')">
+                <input type="checkbox" ${editingPerms.has(g.id+':'+item.id+':'+a.id)?'checked':''} onclick="event.stopPropagation(); toggleAction('${g.id}','${item.id}','${a.id}')">
+                <label>${a.label}${a.id==='view' ? ' (এই মেনু মোটেও দেখা যাবে কিনা)' : ''}</label>
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+    });
+
+    groupsHtml += `
+      <div class="group-block">
+        <div class="row-top">
+          <div class="row-left">
+            <input type="checkbox" ${gFull?'checked':''} data-indet="${gPartial}" onclick="toggleGroupAll('${g.id}')">
+            <div>
+              <div class="group-title" style="cursor:pointer;" onclick="toggleGroupOpen('${g.id}')">${g.title}</div>
+              <div class="group-count">${selInGroup}/${totalInGroup} নির্বাচিত</div>
+            </div>
+          </div>
+          <span class="chev ${gOpen?'open':''}" onclick="toggleGroupOpen('${g.id}')">▾</span>
+        </div>
+        <div class="items-wrap ${gOpen?'open':''}">${itemsHtml}</div>
+      </div>`;
+  });
+
+  wrap.innerHTML = `
+    <div class="editor">
+      <div class="editor-head">
+        <p class="label">রোলের নাম</p>
+        <input id="roleNameInput" value="${nameVal}" placeholder="যেমন: মডারেশন টিম">
+        <p class="editor-note">প্রতিটা মেনুর নিচে তার নির্দিষ্ট ফাংশনগুলো আলাদাভাবে টিক দিন। "দেখুন" ছাড়া মেনুটাই মেনু-তালিকায় দেখাবে না।</p>
+      </div>
+      <div class="tree">${groupsHtml}</div>
+      <div class="editor-footer">
+        <span class="sel-count">নির্বাচিত: ${selCount}/${total} ফাংশন</span>
+        <div class="btns">
+          <button class="btn btn-ghost btn-sm" onclick="closeEditor()">বাতিল</button>
+          <button class="btn btn-primary btn-sm" onclick="saveRole()">সংরক্ষণ করুন</button>
+        </div>
+      </div>
+    </div>
+  `;
+  wrap.querySelectorAll('input[type=checkbox][data-indet]').forEach(cb => { cb.indeterminate = cb.dataset.indet === 'true'; });
+}
+
+function saveRole(){
+  const name = document.getElementById('roleNameInput').value.trim();
+  if(!name){ alert('রোলের নাম দিন।'); return; }
+  if(editingRoleId){
+    const r = roleById(editingRoleId);
+    r.name = name; r.perms = new Set(editingPerms);
+  } else {
+    roles.push({ id:'role_'+Date.now(), name, desc:'কাস্টম রোল — মূল অ্যাডমিন কর্তৃক তৈরি।', locked:false, perms:new Set(editingPerms) });
+  }
+  previewRoleId = editingRoleId || roles[roles.length-1].id;
+  closeEditor();
+  renderRoleGrid(); populateRoleSelect(); renderAccounts(); renderPreview();
+}
+
+function setPreview(roleId){
+  previewRoleId = roleId; previewAccountId = null; editingRoleId = null;
+  renderRoleGrid(); renderAccounts(); renderPreview();
+}
+
+function setPreviewAccount(accountId){
+  const acc = accounts.find(a=>a.id===accountId);
+  if(!acc) return;
+  previewAccountId = accountId; previewRoleId = acc.roleId; editingRoleId = null;
+  renderRoleGrid(); renderAccounts(); renderPreview();
+}
+
+function togglePreviewMenu(key){
+  if(previewOpenMenus.has(key)) previewOpenMenus.delete(key); else previewOpenMenus.add(key);
+  renderPreviewMenuOnly(currentPreviewData());
+}
+
+function currentPreviewData(){
+  if(editingRoleId !== null || (editingPerms && document.getElementById('editorWrap').style.display !== 'none')){
+    const nameEl = document.getElementById('roleNameInput');
+    return { name: nameEl ? (nameEl.value.trim() || 'নতুন রোল') : 'নতুন রোল', perms: editingPerms, isSuper:false, isFlagged:false };
+  }
+  if(previewAccountId !== null){
+    const acc = accounts.find(a=>a.id===previewAccountId);
+    if(acc){
+      const role = roleById(acc.roleId);
+      return { name: acc.name, perms: role ? role.perms : new Set(), isSuper: role ? role.locked : false, isFlagged: !!acc.flagged };
+    }
+  }
+  const role = roleById(previewRoleId);
+  return role ? { name: role.name, perms: role.perms, isSuper: role.locked, isFlagged:false } : { name:'—', perms:new Set(), isSuper:false, isFlagged:false };
+}
+
+function renderLivePreviewFromEditor(){
+  renderPreviewMenuOnly(currentPreviewData());
+  renderUsersSim(currentPreviewData());
+}
+function renderPreview(){
+  renderPreviewMenuOnly(currentPreviewData());
+  renderUsersSim(currentPreviewData());
+}
+
+function renderPreviewMenuOnly(data){
+  document.getElementById('previewWho').innerHTML = `
+    <div class="avatar ${data.isSuper?'super':''}" style="width:30px;height:30px;font-size:11px;">${data.name.slice(0,2)}</div>
+    <div class="txt"><b>${data.name}</b><br>এই রোলের অ্যাডমিন যা দেখবে</div>
+  `;
+  const menu = document.getElementById('previewMenu');
+  let html = '';
+  if(data.isFlagged){
+    html += `<div class="preview-flag-banner">🚩 ফ্ল্যাগড — মেনু দেখা যাচ্ছে, কিন্তু কোনো অ্যাকশন নেওয়া যাবে না।</div>`;
+  }
+  let any = false;
+  GROUPS.forEach(g => {
+    if(g.superOnly && !data.isSuper) return;
+    const visibleItems = g.items.filter(i => data.isSuper || data.perms.has(g.id+':'+i.id+':view'));
+    if(visibleItems.length === 0) return;
+    any = true;
+    html += `<div class="pm-group"><div class="pm-group-title">${g.title}</div>`;
+    visibleItems.forEach(i => {
+      const key = g.id+':'+i.id;
+      const open = previewOpenMenus.has(key);
+      html += `<div class="pm-item allowed">
+        <div class="pm-item-head" onclick="togglePreviewMenu('${key}')">
+          <span class="pm-dot"></span><span>${i.label}</span>
+          <span style="margin-right:auto;"></span>
+          <span class="chev ${open?'open':''}" style="font-size:9px;">▾</span>
+        </div>`;
+      if(open){
+        html += `<div class="pm-actions">`;
+        i.actions.forEach(a => {
+          const eligible = data.isSuper || data.perms.has(g.id+':'+i.id+':'+a.id);
+          const has = eligible && !(data.isFlagged && a.id!=='view');
+          html += `<span class="pm-chip ${has?'':'denied'}">${a.label}</span>`;
+        });
+        html += `</div>`;
+      }
+      html += `</div>`;
+    });
+    html += `</div>`;
+  });
+  if(!any){ html += `<div class="preview-empty">এই রোলে এখনও কোনো মেনুর "দেখুন" পারমিশন নেই — লগইন করলে খালি মেনু দেখাবে।</div>`; }
+  menu.innerHTML = html;
+}
+
+function renderUsersSim(data){
+  const box = document.getElementById('usersSim');
+  const hasView = data.isSuper || data.perms.has('users:users:view');
+  if(!hasView){
+    box.innerHTML = `<div class="sim-locked">এই রোলের "ইউজারগণ" মেনুতেই অ্যাক্সেস নেই — স্ক্রিনটা খুলবে না।</div>`;
+    return;
+  }
+  const has = (a) => (data.isSuper || data.perms.has('users:users:'+a)) && !data.isFlagged;
+  box.innerHTML = `
+    ${data.isFlagged ? `<div class="sim-flag-banner">🚩 ফ্ল্যাগড অ্যাডমিন — স্ক্রিন খুলবে কিন্তু সব অ্যাকশন বাটন ব্লকড থাকবে।</div>` : ''}
+    <div class="sim-row">
+      <div class="sim-user-top">
+        <div class="avatar" style="width:34px;height:34px;font-size:11px;">রক</div>
+        <div>
+          <p class="sim-user-name">রাকিব করিম</p>
+          <p class="sim-user-meta">017XXXXXXXX · সলভার · ব্যালেন্স ৳ ১,২৪০</p>
+        </div>
+      </div>
+      <div class="sim-btns">
+        <button class="btn btn-ghost btn-sm" ${has('ban')?'':'disabled'}>ব্যান করুন</button>
+        <button class="btn btn-ghost btn-sm" ${has('restrict')?'':'disabled'}>রেস্ট্রিক্ট</button>
+        <button class="btn btn-ghost btn-sm" ${has('balance_adjust')?'':'disabled'}>ব্যালেন্স এডজাস্ট</button>
+        <button class="btn btn-ghost btn-sm" ${has('score_adjust')?'':'disabled'}>স্কোর এডজাস্ট</button>
+        <button class="btn btn-ghost btn-sm" ${has('change_role')?'':'disabled'}>রোল পরিবর্তন</button>
+        <button class="btn btn-danger-ghost btn-sm" ${has('delete')?'':'disabled'}>মুছে ফেলুন</button>
+      </div>
+    </div>
+  `;
+}
+
+function populateRoleSelect(){
+  const sel = document.getElementById('newAccRole');
+  sel.innerHTML = roles.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+}
+
+function renderAccounts(){
+  document.getElementById('accCount').textContent = accounts.length + ' জন';
+  const list = document.getElementById('accList');
+  list.innerHTML = accounts.map(a => {
+    const role = roleById(a.roleId);
+    const initials = a.name.trim().split(' ').map(w=>w[0]).slice(0,2).join('');
+    const isPreviewing = previewAccountId ? a.id===previewAccountId : a.roleId===previewRoleId;
+    return `
+      <div class="acc-row ${isPreviewing?'previewing':''} ${a.flagged?'flagged':''}" onclick="setPreviewAccount(${a.id})">
+        <div class="avatar ${role && role.locked ? 'super':''}">${initials}</div>
+        <div class="acc-info">
+          <p class="acc-name">${a.name} ${a.flagged ? '<span class=\"flag-tag\">🚩 ফ্ল্যাগড</span>' : ''}</p>
+          <p class="acc-phone">${a.phone}</p>
+        </div>
+        <span class="badge ${role && role.locked ? 'badge-slate':'badge-orange'} acc-role-badge">${role ? role.name : '—'}</span>
+        ${role && role.locked
+          ? `<span class="status-pill status-active status-locked" title="সুপার অ্যাডমিন অ্যাকাউন্ট নিষ্ক্রিয় করা যায় না">🔒 সক্রিয়</span>`
+          : `<button class="btn btn-sm ${a.flagged?'btn-danger-ghost':'btn-ghost'}" onclick="event.stopPropagation(); toggleAccountFlag(${a.id})" title="সুপার অ্যাডমিন শুধু এই বাটন ব্যবহার করতে পারবেন">${a.flagged ? 'আনফ্ল্যাগ' : '🚩 ফ্ল্যাগ করুন'}</button>
+             <span class="status-pill ${a.active ? 'status-active':'status-inactive'}" onclick="event.stopPropagation(); toggleAccountStatus(${a.id})">${a.active ? 'সক্রিয়' : 'নিষ্ক্রিয়'}</span>`
+        }
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleAccountFlag(id){
+  const a = accounts.find(x=>x.id===id);
+  const role = roleById(a.roleId);
+  if(role && role.locked){ return; }
+  a.flagged = !a.flagged;
+  renderAccounts();
+  if(previewAccountId === id) renderPreview();
+}
+
+function toggleAccountStatus(id){
+  const a = accounts.find(x=>x.id===id);
+  const role = roleById(a.roleId);
+  if(role && role.locked){ return; }
+  a.active = !a.active;
+  renderAccounts();
+}
+
+function addAccount(){
+  const name = document.getElementById('newAccName').value.trim();
+  const phone = document.getElementById('newAccPhone').value.trim();
+  const roleId = document.getElementById('newAccRole').value;
+  if(!name || !phone){ alert('নাম ও ফোন নম্বর দিন।'); return; }
+  if(!/^01[0-9]{9}$/.test(phone)){ alert('সঠিক ফোন নম্বর দিন (যেমন: 01712345678)।'); return; }
+  accounts.push({ id: nextAccId++, name, phone, roleId, active:true, flagged:false });
+  document.getElementById('newAccName').value = '';
+  document.getElementById('newAccPhone').value = '';
+  renderAccounts(); renderRoleGrid();
+}
+
+/* ---------------- অ্যাক্টিভিটি লগ (শুধু সুপার অ্যাডমিন দেখবে) ---------------- */
+
+let activityLogs = [
+  { id:1, adminName:'সুমাইয়া আক্তার', roleId:'kyc', action:'ban', targetType:'ইউজার', target:'নাঈম হোসেন (017XXXXXXX)', reason:'একাধিক ফেক প্রোফাইল রিপোর্ট পাওয়া গেছে এবং প্ল্যাটফর্ম নীতিমালা লঙ্ঘন করেছে।', time:'2026-09-19T14:32:00' },
+  { id:2, adminName:'সুমাইয়া আক্তার', roleId:'kyc', action:'reject', targetType:'কেওয়াইসি', target:'মোঃ সাইফুল ইসলাম', reason:'জমাকৃত এনআইডি কার্ডের ছবি অস্পষ্ট ছিল, পুনরায় জমা দিতে বলা হয়েছে।', time:'2026-09-19T11:05:00' },
+  { id:3, adminName:'রাকিব হাসান', roleId:'finance', action:'reject', targetType:'উইথড্রয়াল', target:'৳ ৫,৫০০ — ইউজার: তাহমিনা বেগম', reason:'ব্যাংক অ্যাকাউন্টের নাম প্রোফাইলের নামের সাথে মিলছে না।', time:'2026-09-18T16:47:00' },
+  { id:4, adminName:'তানভীর আহমেদ', roleId:'support', action:'hide', targetType:'রিভিউ', target:'রিভিউ #৪৪২১ (৫★ — সন্দেহজনক)', reason:'রিভিউটি স্প্যাম বলে সন্দেহ হওয়ায় তদন্ত চলাকালীন লুকানো হয়েছে।', time:'2026-09-18T10:12:00' },
+  { id:5, adminName:'রাকিব হাসান', roleId:'finance', action:'balance_adjust', targetType:'ইউজার ব্যালেন্স', target:'ইমরান খান — ৳ ২,০০০ যোগ', reason:'রিফান্ড প্রসেসিংয়ের সময় ম্যানুয়াল এডজাস্টমেন্ট প্রয়োজন হয়েছিল।', time:'2026-09-17T13:20:00' },
+  { id:6, adminName:'সুমাইয়া আক্তার', roleId:'kyc', action:'restrict', targetType:'ইউজার', target:'সাব্বির হোসেন', reason:'সন্দেহজনক লেনদেন প্যাটার্ন পাওয়ায় তদন্তের জন্য সাময়িক রেস্ট্রিকশন দেওয়া হয়েছে।', time:'2026-09-16T09:41:00' },
+  { id:7, adminName:'তানভীর আহমেদ', roleId:'support', action:'delete', targetType:'রিভিউ', target:'রিভিউ #৪১৮৯', reason:'গালিগালাজপূর্ণ ভাষা ব্যবহারের কারণে মুছে ফেলা হয়েছে।', time:'2026-09-15T18:03:00' },
+  { id:8, adminName:'রাকিব হাসান', roleId:'finance', action:'reconcile', targetType:'Escrow', target:'কন্ট্রাক্ট #EC-2291', reason:'ক্লায়েন্ট ও সলভার উভয়ের নিশ্চিতকরণের পর এস্ক্রো রিকনসাইল করা হয়েছে।', time:'2026-09-14T15:55:00' }
+];
+
+const verbMap = {
+  ban:{label:'ব্যান করেছেন', icon:'🚫', type:'danger'},
+  restrict:{label:'রেস্ট্রিক্ট করেছেন', icon:'⛔', type:'warn'},
+  reject:{label:'রিজেক্ট করেছেন', icon:'✖️', type:'warn'},
+  approve:{label:'অনুমোদন করেছেন', icon:'✔️', type:'neutral'},
+  delete:{label:'মুছে ফেলেছেন', icon:'🗑️', type:'danger'},
+  hide:{label:'লুকিয়েছেন', icon:'🙈', type:'warn'},
+  balance_adjust:{label:'ব্যালেন্স এডজাস্ট করেছেন', icon:'💰', type:'neutral'},
+  reconcile:{label:'রিকনসাইল করেছেন', icon:'🔄', type:'neutral'}
+};
+
+let logFilterText = '';
+let logFilterAdmin = '';
+
+function uniqueLogAdmins(){
+  return [...new Map(activityLogs.map(e => [e.adminName, e])).values()];
+}
+
+function populateLogAdminSelect(){
+  const sel = document.getElementById('logAdminSelect');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">সব অ্যাডমিন</option>' + uniqueLogAdmins().map(e => {
+    const role = roleById(e.roleId);
+    return `<option value="${e.adminName}">${e.adminName}${role ? ' — '+role.name : ''}</option>`;
+  }).join('');
+  sel.value = cur;
+}
+
+function applyLogFilter(){
+  logFilterText = document.getElementById('logSearchInput').value.trim().toLowerCase();
+  logFilterAdmin = document.getElementById('logAdminSelect').value;
+  renderActivityLog();
+}
+function clearLogFilter(){
+  document.getElementById('logSearchInput').value = '';
+  logFilterText = ''; logFilterAdmin = '';
+  renderActivityLog();
+}
+
+function renderActivityLog(){
+  populateLogAdminSelect();
+  document.getElementById('logAdminSelect').value = logFilterAdmin;
+
+  let list = activityLogs.slice().sort((a,b) => new Date(b.time) - new Date(a.time));
+
+  list = list.filter(entry => {
+    if(logFilterAdmin && entry.adminName !== logFilterAdmin) return false;
+    if(logFilterText && !entry.adminName.toLowerCase().includes(logFilterText)) return false;
+    return true;
+  });
+
+  document.getElementById('logCount').textContent = list.length + ' টি রেকর্ড';
+  const box = document.getElementById('logList');
+  if(list.length === 0){
+    box.innerHTML = `<div class="log-empty">এই ফিল্টারে কোনো অ্যাক্টিভিটি পাওয়া যায়নি — অ্যাডমিনের নাম ঠিক আছে কিনা দেখুন।</div>`;
+    return;
+  }
+  box.innerHTML = list.map(entry => {
+    const role = roleById(entry.roleId);
+    const v = verbMap[entry.action] || {label:'পরিবর্তন করেছেন', icon:'✏️', type:'neutral'};
+    const dt = new Date(entry.time);
+    const dateStr = dt.toLocaleDateString('bn-BD', {day:'2-digit', month:'short', year:'numeric'});
+    const timeStr = dt.toLocaleTimeString('bn-BD', {hour:'2-digit', minute:'2-digit'});
+    const initials = entry.adminName.trim().split(' ').map(w=>w[0]).slice(0,2).join('');
+    return `
+      <div class="log-row">
+        <div class="avatar ${role && role.locked ? 'super':''}" style="width:34px;height:34px;font-size:12px;flex-shrink:0;">${initials}</div>
+        <div class="log-body">
+          <div class="log-headline-row">
+            <p class="log-headline">
+              <span class="who">${entry.adminName}</span>
+              <span class="badge ${role && role.locked ? 'badge-slate':'badge-orange'} log-role-badge">${role ? role.name : '—'}</span>
+            </p>
+            <span class="log-time">${dateStr}, ${timeStr}</span>
+          </div>
+          <div class="log-icon-row">
+            <span class="log-icon ${v.type}">${v.icon}</span>
+            <p class="log-action">${entry.targetType}: <span class="target">${entry.target}</span> — ${v.label}</p>
+          </div>
+          <p class="log-reason"><b>কারণ:</b> ${entry.reason}</p>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+populateRoleSelect();
+renderRoleGrid();
+renderAccounts();
+renderPreview();
+</script>
+</body>
+</html>

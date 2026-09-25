@@ -1,0 +1,83 @@
+> Task :app:compileDebugKotlin
+> Task :app:compileDebugKotlin
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/remote/SupabaseRealtimeManager.kt:1381:44 Argument type mismatch: actual type is 'SupabaseRealtimeManager.TypingBroadcastPayload', but 'JsonObject' was expected.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/remote/SupabaseSyncManager.kt:17:40 Unresolved reference 'FilterOperator'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/remote/SupabaseSyncManager.kt:289:43 This declaration needs opt-in. Its usage must be marked with '@kotlin.time.ExperimentalTime' or '@OptIn(kotlin.time.ExperimentalTime::class)'
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/remote/SupabaseSyncManager.kt:289:87 This declaration needs opt-in. Its usage must be marked with '@kotlin.time.ExperimentalTime' or '@OptIn(kotlin.time.ExperimentalTime::class)'
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/remote/SupabaseSyncManager.kt:666:34 Unresolved reference 'FilterOperator'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/remote/SupabaseSyncManager.kt:687:34 Unresolved reference 'FilterOperator'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/repository/SomadhanRepository.kt:365:13 Unresolved reference 'releaseEscrow'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/repository/SomadhanRepository.kt:507:13 Unresolved reference 'cloudUser'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/repository/SomadhanRepository.kt:508:30 Unresolved reference 'cloudUser'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/repository/SomadhanRepository.kt:1437:29 This declaration needs opt-in. Its usage must be marked with '@kotlin.time.ExperimentalTime' or '@OptIn(kotlin.time.ExperimentalTime::class)'
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/repository/SomadhanRepository.kt:1437:62 This declaration needs opt-in. Its usage must be marked with '@kotlin.time.ExperimentalTime' or '@OptIn(kotlin.time.ExperimentalTime::class)'
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/repository/SomadhanRepository.kt:3587:42 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'String?'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/repository/SomadhanRepository.kt:4186:54 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'String?'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/repository/SomadhanRepository.kt:4957:54 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'String?'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/repository/SomadhanRepository.kt:4967:56 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'String?'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/repository/SomadhanRepository.kt:5293:46 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'String?'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/repository/SomadhanRepository.kt:8172:17 Unresolved reference 'cloudSolver'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/repository/SomadhanRepository.kt:8172:41 Unresolved reference 'cloudSolver'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/repository/SomadhanRepository.kt:8172:97 Unresolved reference 'cloudSolver'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/repository/SomadhanRepository.kt:8173:36 Unresolved reference 'cloudSolver'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/data/repository/SomadhanRepository.kt:8174:24 Unresolved reference 'cloudSolver'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminAdditionalChargesView.kt:248:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminAdditionalChargesView.kt:249:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminAdditionalChargesView.kt:260:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminAuditLogView.kt:250:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminAuditLogView.kt:251:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminAuditLogView.kt:262:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminCancelledBidsView.kt:248:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminCancelledBidsView.kt:249:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminCancelledBidsView.kt:260:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminCategoriesView.kt:248:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminCategoriesView.kt:249:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminCategoriesView.kt:260:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminChatMonitoringView.kt:248:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminChatMonitoringView.kt:249:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminChatMonitoringView.kt:260:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminEscrowView.kt:252:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminEscrowView.kt:253:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminEscrowView.kt:264:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminFaqManagementView.kt:248:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminFaqManagementView.kt:249:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminFaqManagementView.kt:260:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminKycView.kt:248:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminKycView.kt:249:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminKycView.kt:260:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminManualNotificationView.kt:248:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminManualNotificationView.kt:249:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminManualNotificationView.kt:260:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminPanelScreen.kt:258:25 Unresolved reference 'CsvImportUtil'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminPanelScreen.kt:259:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminPanelScreen.kt:260:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminPanelScreen.kt:271:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminProblemsView.kt:248:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminProblemsView.kt:249:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminProblemsView.kt:260:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminReputationEngineView.kt:248:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminReputationEngineView.kt:249:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminReputationEngineView.kt:260:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminSettingsView.kt:248:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminSettingsView.kt:249:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminSettingsView.kt:260:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminSolverQuotaView.kt:248:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminSolverQuotaView.kt:249:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminSolverQuotaView.kt:260:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminStatsView.kt:248:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminStatsView.kt:249:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminStatsView.kt:260:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminTransactionsView.kt:249:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminTransactionsView.kt:250:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminTransactionsView.kt:264:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminUserLookupView.kt:249:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminUserLookupView.kt:250:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminUserLookupView.kt:264:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminUsersView.kt:248:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminUsersView.kt:249:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminUsersView.kt:260:27 Unresolved reference 'tasks'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminWithdrawalsView.kt:248:25 Unresolved reference 'CsvParsedResult'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminWithdrawalsView.kt:249:25 Unresolved reference 'CsvImportSummary'.
+e: file:///C:/Users/hello/Desktop/App/Supabase/somadhan-realtime-scoping-step6-audit/app/src/main/java/com/example/ui/screens/AdminWithdrawalsView.kt:260:27 Unresolved reference 'tasks'.
+
+> Task :app:compileDebugKotlin FAILED

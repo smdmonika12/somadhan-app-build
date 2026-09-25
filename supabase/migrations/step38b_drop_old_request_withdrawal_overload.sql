@@ -1,0 +1,16 @@
+-- [RPC_SYNC_FIX — Step 7 পরবর্তী ফিক্স, ধারাবাহিকতা] step38 migration apply করার সময় ধরা
+-- পড়েছে: নতুন p_client_withdrawal_id প্যারামিটার সহ CREATE OR REPLACE পুরনো ৭-argument
+-- request_withdrawal ফাংশনটাকে replace করেনি — Postgres argument list-কে ফাংশনের identity-র
+-- অংশ ধরে, তাই signature বদলানোয় সেটা একটা সম্পূর্ণ আলাদা ৮-argument overload তৈরি করেছিল
+-- (পুরনো ৭-argument ভার্সন ডাটাবেসে রয়েই গিয়েছিল)। দুইটা request_withdrawal(...) overload
+-- একসাথে থাকলে PostgREST-এর RPC call resolution ambiguous হয়ে যেতে পারতো।
+--
+-- ফিক্স: পুরনো ৭-argument overload explicit drop। শুধু নতুন ৮-argument
+-- (p_client_withdrawal_id সহ, DEFAULT NULL) ভার্সনটাই থাকবে — এই ভার্সন প্যারামিটার ছাড়া
+-- কল হলে পুরনো ৭-argument কলের সাথে functionally সমতুল্য, তাই কোনো callsite ভাঙে না।
+--
+-- নোট: এই migration লাইভ Supabase প্রজেক্টে ইতিমধ্যে apply করা হয়েছে (দেখুন
+-- RPC_SYNC_FIX_PROGRESS.md, "migration apply" এন্ট্রি) — এই ফাইলটা শুধু migration
+-- history-কে লোকাল রেপোর সাথে সিঙ্কে রাখার জন্য যোগ করা হলো, যাতে future fresh-DB
+-- setup/replay-এ এই ধাপ মিস না হয়।
+DROP FUNCTION IF EXISTS public.request_withdrawal(numeric, text, text, text, text, text, text);

@@ -1,0 +1,59 @@
+-- [ধাপ ৩৩.২ ফিক্স] ADMIN_SYSTEM real-session গ্যাপের সমাধান — একটা real Supabase Auth admin
+-- account সিড করা হলো, যাতে is_admin(auth.uid())-নির্ভর সব RPC/RLS admin সেশনে কাজ করে।
+--
+-- এই ফাইলটা এই সেশনেই Supabase MCP (execute_sql/apply_migration) দিয়ে সরাসরি apply করা হয়েছে
+-- (ফলাফল DB-তে গিয়ে যাচাই করা হয়েছে: public.is_admin(<uuid>) = true)। এখানে শুধু
+-- ইতিহাস/রোলব্যাক রেফারেন্সের জন্য রাখা হলো (গ্লোবাল নিয়ম #১৩)।
+--
+-- ⚠️ password-এর plaintext কোনো জায়গাতেই (এই ফাইলে, কোডে, বা zip-এর অন্য কোথাও) রাখা হয়নি —
+-- শুধু bcrypt hash (crypt() দিয়ে তৈরি) সংরক্ষিত হয়েছে।
+--
+-- নিচের UUID/phone মান শুধু ডকুমেন্টেশনের জন্য — পুনরায় চালালে auth.users-এ duplicate/conflict
+-- হবে, তাই এটা re-run করার উদ্দেশ্যে লেখা হয়নি (idempotent না)।
+
+-- ধাপ ১: auth.users + auth.identities row (GoTrue-compatible bcrypt hash, pgcrypto দিয়ে)
+-- ফলাফল id: 2c9ba01d-c03f-4e23-8a6b-ac04a6e943e4, phone: +8801963533981 (E.164)
+--
+-- insert into auth.users (
+--   id, instance_id, aud, role, phone, phone_confirmed_at,
+--   encrypted_password, raw_app_meta_data, raw_user_meta_data,
+--   created_at, updated_at,
+--   confirmation_token, recovery_token, email_change_token_new,
+--   email_change, phone_change, phone_change_token, email_change_token_current,
+--   reauthentication_token, is_sso_user, is_anonymous
+-- ) values (
+--   gen_random_uuid(), '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
+--   '+8801963533981', now(),
+--   extensions.crypt('<admin-password>', extensions.gen_salt('bf')),
+--   '{"provider":"phone","providers":["phone"]}'::jsonb,
+--   '{"name":"Support Manager"}'::jsonb,
+--   now(), now(), '', '', '', '', '', '', '', '', false, false
+-- );
+--
+-- insert into auth.identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+-- values ('<new-id>', '<new-id>', jsonb_build_object('sub', '<new-id>', 'phone', '+8801963533981'), 'phone', now(), now(), now());
+
+-- ধাপ ২: handle_new_auth_user trigger স্বয়ংক্রিয়ভাবে public.users row বানিয়ে দেয় (role='USER' by
+-- default) -- এরপর role='ADMIN'-এ promote করা হয়েছে:
+--
+-- update public.users
+-- set role = 'ADMIN', email = 'admin@somadhan.com', latitude = 23.8103, longitude = 90.4125,
+--     address = 'ঢাকা, বাংলাদেশ', has_user_role = true, has_solver_role = false
+-- where id = '2c9ba01d-c03f-4e23-8a6b-ac04a6e943e4';
+
+-- ধাপ ৩: app-level admin gate (AdminCredentials.kt) ও real Supabase Auth password একই মান দিয়ে
+-- সিঙ্ক রাখতে secure admin_credentials টেবিল + platform_settings.admin_phone আপডেট:
+--
+-- insert into public.admin_credentials (id, phone, password_hash, updated_at)
+-- values (1, '01963533981', extensions.crypt('<admin-password>', extensions.gen_salt('bf')), now())
+-- on conflict (id) do update set phone = excluded.phone, password_hash = excluded.password_hash, updated_at = now();
+--
+-- insert into public.platform_settings (key, value) values ('admin_phone', '01963533981')
+-- on conflict (key) do update set value = excluded.value;
+
+-- ⚠️ ভবিষ্যতে admin যদি Settings স্ক্রিন দিয়ে পাসওয়ার্ড বদলায় (AdminCredentials.updateCredentials),
+-- সেটা এখনো শুধু app-level hash (উপরের ধাপ ৩) আপডেট করে -- real Supabase Auth password
+-- (auth.users.encrypted_password) সাথে সাথে সিঙ্ক হয় না। এই দুটো সিঙ্কে রাখতে ভবিষ্যতে
+-- `updateCredentials()`-এ `SupabaseAuthManager.updatePassword(newRawPassword)` কল যোগ করা উচিত
+-- (admin তখন loginAsAdmin() দিয়ে ইতিমধ্যেই real session-এ থাকবে) -- এই সেশনের স্কোপের বাইরে,
+-- পরবর্তী কোনো সেশনে flag করা হলো।

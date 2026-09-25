@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>এডমিন প্রোফাইল — মকআপ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --orange: #FF6500;
+    --orange-pressed: #E65100;
+    --orange-light: #FFF3E0;
+    --orange-container: #FFE0B2;
+
+    --bg: #FFFFFF;
+    --surface: #FFFFFF;
+    --surface-variant: #F8F9FA;
+    --card-bg: #FAFAFA;
+    --divider: #E5E5E5;
+    --border: #E0E0E0;
+
+    --text-primary: #111111;
+    --text-secondary: #555555;
+    --text-hint: #9E9E9E;
+
+    --success: #10B981;
+    --success-light: #E8F5E9;
+    --error: #EF4444;
+    --error-light: #FFEBEE;
+    --info: #0284C7;
+    --info-light: #E0F2FE;
+
+    --admin-slate: #334155;
+    --admin-slate-light: #E2E8F0;
+
+    --radius-sm: 8px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0;
+    background: var(--surface-variant);
+    color: var(--text-primary);
+    font-family: 'Hind Siliguri', system-ui, sans-serif;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .page { max-width: 1160px; margin: 0 auto; padding: 20px 16px 48px; }
+
+  .intro {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 18px 20px; margin-bottom: 18px;
+  }
+  .intro h1 { font-size: 19px; font-weight: 700; margin: 0 0 4px; }
+  .intro .sub { font-size: 13px; color: var(--text-hint); margin: 0 0 10px; }
+  .intro p { font-size: 13.5px; color: var(--text-secondary); line-height: 1.65; margin: 0; }
+  .intro b { color: var(--text-primary); }
+  .menu-chip {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;
+    background: var(--orange-light); color: var(--orange-pressed); padding: 5px 11px; border-radius: 999px; margin-top: 10px;
+  }
+
+  .layout { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  @media (min-width: 940px) {
+    .layout { grid-template-columns: 320px minmax(0,1fr); align-items: start; }
+    .list-col { position: sticky; top: 16px; }
+  }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+
+  .list-head { padding: 14px 16px 10px; border-bottom: 1px solid var(--divider); }
+  .list-head h2 { font-size: 14.5px; font-weight: 700; margin: 0 0 8px; }
+  .list-search { position: relative; }
+  .list-search input {
+    width: 100%; font-family: inherit; font-size: 12.5px; padding: 8px 10px 8px 30px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-variant); color: var(--text-primary);
+  }
+  .list-search input:focus { outline: none; border-color: var(--orange); background: var(--surface); }
+  .list-search .ic { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--text-hint); }
+
+  .admin-list { display: flex; flex-direction: column; padding: 8px; gap: 5px; max-height: 560px; overflow-y: auto; }
+  .admin-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-md);
+    cursor: pointer; border: 1px solid transparent; transition: background .15s, border-color .15s;
+  }
+  .admin-item:hover { background: var(--orange-light); }
+  .admin-item.active { background: var(--orange-light); border-color: var(--orange); }
+  .mini-avatar {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 12.5px; font-weight: 700; color: var(--admin-slate); background: var(--admin-slate-light);
+    background-size: cover; background-position: center; overflow: hidden;
+  }
+  .mini-avatar.super { background-color: var(--orange-container); color: var(--orange-pressed); }
+  .admin-item-info { flex: 1; min-width: 0; }
+  .admin-item-name { font-size: 13px; font-weight: 700; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .admin-item-desig { font-size: 11px; color: var(--text-hint); margin: 1px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mini-badge {
+    font-size: 9.5px; font-weight: 700; padding: 2.5px 7px; border-radius: 999px; flex-shrink: 0; white-space: nowrap;
+  }
+  .badge-orange { background: var(--orange-container); color: var(--orange-pressed); }
+  .badge-slate { background: var(--admin-slate-light); color: var(--admin-slate); }
+  .list-empty { text-align: center; padding: 26px 10px; font-size: 12px; color: var(--text-hint); }
+
+  /* ---- profile card ---- */
+  .profile-card { overflow: hidden; }
+  .cover {
+    height: 92px; background: linear-gradient(120deg, var(--orange) 0%, #FF8A3D 100%); position: relative;
+  }
+  .cover.super { background: linear-gradient(120deg, var(--admin-slate) 0%, #4B5D75 100%); }
+  .profile-top { padding: 0 20px 16px; margin-top: -42px; position: relative; }
+  .avatar-wrap { position: relative; width: 88px; }
+  .big-avatar {
+    width: 88px; height: 88px; border-radius: 50%; border: 4px solid var(--surface);
+    display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700;
+    color: var(--admin-slate); background: var(--admin-slate-light); background-size: cover; background-position: center;
+    overflow: hidden;
+  }
+  .big-avatar.super { background-color: var(--orange-container); color: var(--orange-pressed); }
+  .avatar-upload-btn {
+    position: absolute; right: -2px; bottom: -2px; width: 30px; height: 30px; border-radius: 50%;
+    background: var(--orange); color: #fff; border: 3px solid var(--surface); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
+  }
+  .avatar-upload-btn:hover { background: var(--orange-pressed); }
+  .avatar-hint { font-size: 10.5px; color: var(--text-hint); margin: 8px 0 0; }
+
+  .profile-namebar { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .profile-name { font-size: 18px; font-weight: 700; margin: 0; }
+  .profile-desig { font-size: 13px; color: var(--text-secondary); margin: 2px 0 0; }
+  .role-badge-lg { font-size: 11px; font-weight: 700; padding: 4px 11px; border-radius: 999px; white-space: nowrap; }
+
+  .profile-body { padding: 4px 20px 20px; }
+  .section-title { font-size: 12.5px; font-weight: 700; color: var(--text-hint); text-transform: uppercase; letter-spacing: .3px; margin: 18px 0 10px; }
+  .form-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 620px) { .form-grid { grid-template-columns: 1fr 1fr; } }
+  .field label { display: block; font-size: 11.5px; color: var(--text-hint); font-weight: 600; margin-bottom: 5px; }
+  .field .req { color: var(--error); }
+  .field input, .field textarea {
+    width: 100%; font-family: inherit; font-size: 13px; padding: 9px 11px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); background: var(--surface); color: var(--text-primary);
+  }
+  .field input:focus, .field textarea:focus { outline: none; border-color: var(--orange); }
+  .field input:disabled { background: var(--surface-variant); color: var(--text-hint); cursor: not-allowed; }
+  .field-note { font-size: 10.5px; color: var(--text-hint); margin-top: 4px; }
+  textarea { resize: vertical; min-height: 68px; font-family: inherit; }
+
+  .stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 4px; }
+  .stat-box { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; text-align: center; background: var(--card-bg); }
+  .stat-num { font-size: 18px; font-weight: 700; color: var(--orange-pressed); }
+  .stat-lbl { font-size: 10.5px; color: var(--text-hint); margin-top: 3px; }
+
+  .profile-footer {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    padding: 14px 20px; background: var(--surface-variant); border-top: 1px solid var(--divider);
+  }
+  .save-note { font-size: 11.5px; color: var(--text-hint); }
+  .btns { display: flex; gap: 8px; }
+  .btn {
+    font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border-radius: var(--radius-sm);
+    padding: 9px 16px; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: var(--orange); color: #fff; }
+  .btn-primary:hover { background: var(--orange-pressed); }
+  .btn-ghost { background: transparent; color: var(--text-secondary); border-color: var(--border); }
+  .btn-ghost:hover { background: var(--surface-variant); }
+  .saved-toast {
+    display: none; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #0B7A4B;
+    background: var(--success-light); padding: 6px 12px; border-radius: 999px;
+  }
+  .saved-toast.show { display: inline-flex; }
+
+  .flag-banner {
+    margin-top: 12px; font-size: 12px; line-height: 1.6; color: #B3261E; background: var(--error-light);
+    border: 1px solid #F5B5B5; border-radius: var(--radius-sm); padding: 9px 12px;
+  }
+  .flag-banner b { color: #B3261E; }
+
+  .perm-grid { display: flex; flex-wrap: wrap; gap: 7px; }
+  .perm-chip {
+    font-size: 11.5px; font-weight: 600; color: #0B7A4B; background: var(--success-light);
+    border-radius: 999px; padding: 5px 11px;
+  }
+
+  .login-info-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 620px) { .login-info-grid { grid-template-columns: 1fr 1fr; } }
+  .login-info-box, .session-list {
+    border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; background: var(--card-bg);
+  }
+  .login-info-top { display: flex; align-items: center; gap: 7px; font-size: 13px; margin-bottom: 8px; }
+  .login-info-line { font-size: 12px; color: var(--text-secondary); margin: 4px 0 0; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--text-hint); }
+  .status-dot.online { background: var(--success); }
+  .status-dot.offline { background: var(--text-hint); }
+  .session-row { display: flex; align-items: center; gap: 9px; padding: 6px 0; border-bottom: 1px dashed var(--divider); }
+  .session-row:last-child { border-bottom: none; }
+  .session-info { min-width: 0; }
+  .session-device { font-size: 12px; font-weight: 600; margin: 0; }
+  .session-meta { font-size: 10.5px; color: var(--text-hint); margin: 1px 0 0; }
+
+  .security-row { display: flex; flex-direction: column; gap: 10px; }
+  .security-item {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    border: 1px solid var(--border); border-radius: var(--radius-md); padding: 11px 13px; background: var(--card-bg);
+  }
+  .security-item b { font-size: 12.5px; }
+  .toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; cursor: pointer; inset: 0; background: var(--border); border-radius: 999px; transition: .15s;
+  }
+  .toggle-slider::before {
+    content: ""; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: #fff;
+    border-radius: 50%; transition: .15s;
+  }
+  .toggle-switch input:checked + .toggle-slider { background: var(--orange); }
+  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="intro">
+    <h1>এডমিন প্রোফাইল</h1>
+    <p class="sub">মকআপ — বর্তমান অ্যাপ ডিজাইন সিস্টেম (Somadhan) অনুসরণ করে তৈরি</p>
+    <p>সুপার অ্যাডমিনসহ প্রতিটা রোলের অ্যাডমিনের নিজস্ব প্রোফাইল থাকবে — নাম, পদবি ও প্রোফাইল ছবি নিজে আপলোড/এডিট করতে পারবেন। রোল ও ফোন নম্বর নিরাপত্তার জন্য লক করা থাকে, শুধু রোল ম্যানেজমেন্ট থেকে পরিবর্তনযোগ্য।</p>
+    <span class="menu-chip">👤 admin panel সাইডবারে নতুন মেনু: "প্রোফাইল"</span>
+  </div>
+
+  <div class="layout">
+    <div class="list-col card">
+      <div class="list-head">
+        <h2>সব এডমিন</h2>
+        <div class="list-search">
+          <span class="ic">🔍</span>
+          <input id="adminSearch" placeholder="নাম দিয়ে খুঁজুন" oninput="renderAdminList()">
+        </div>
+      </div>
+      <div class="admin-list" id="adminList"></div>
+    </div>
+
+    <div id="profileCol"></div>
+  </div>
+</div>
+
+<script>
+const ROLES = {
+  super:  { name:'সুপার অ্যাডমিন', locked:true },
+  kyc:    { name:'কেওয়াইসি ম্যানেজার', locked:false },
+  finance:{ name:'ফাইন্যান্স অফিসার', locked:false },
+  support:{ name:'সাপোর্ট এজেন্ট', locked:false }
+};
+
+let admins = [
+  { id:1, name:'প্রধান অ্যাডমিন', designation:'সুপার অ্যাডমিন প্রধান', phone:'01700000000', email:'admin@somadhan.com', roleId:'super', photo:null, joined:'জানুয়ারি ২০২৪', actions:'১,৯৮২', bio:'প্ল্যাটফর্মের সার্বিক তত্ত্বাবধান ও সব বিভাগের সমন্বয় করেন।', flagged:false, online:true, lastLogin:'এখনই সক্রিয়', device:'Chrome · Windows', ip:'103.108.XX.XX',
+    sessions:[ {device:'Chrome · Windows', location:'ঢাকা, বাংলাদেশ', time:'এখন সক্রিয়'}, {device:'Somadhan Admin App · Android', location:'ঢাকা, বাংলাদেশ', time:'গতকাল, ০৯:৪০ PM'} ] },
+  { id:2, name:'সুমাইয়া আক্তার', designation:'কেওয়াইসি বিভাগীয় প্রধান', phone:'01812345678', email:'sumaiya@somadhan.com', roleId:'kyc', photo:null, joined:'মার্চ ২০২৫', actions:'৪৫৬', bio:'ইউজার ভেরিফিকেশন ও কেওয়াইসি ডকুমেন্ট রিভিউয়ের দায়িত্বে আছেন।', flagged:false, online:false, lastLogin:'আজ, ১১:০৫ AM', device:'Chrome · macOS', ip:'103.112.XX.XX',
+    sessions:[ {device:'Chrome · macOS', location:'ঢাকা, বাংলাদেশ', time:'আজ, ১১:০৫ AM'}, {device:'Somadhan Admin App · iOS', location:'ঢাকা, বাংলাদেশ', time:'২ দিন আগে'} ] },
+  { id:3, name:'রাকিব হাসান', designation:'ফাইন্যান্স অফিসার', phone:'01911223344', email:'rakib@somadhan.com', roleId:'finance', photo:null, joined:'মে ২০২৫', actions:'৩১২', bio:'উইথড্রয়াল, এস্ক্রো ও লেনদেন ব্যবস্থাপনা দেখেন।', flagged:false, online:false, lastLogin:'গতকাল, ০৪:৪৭ PM', device:'Firefox · Windows', ip:'103.94.XX.XX',
+    sessions:[ {device:'Firefox · Windows', location:'চট্টগ্রাম, বাংলাদেশ', time:'গতকাল, ০৪:৪৭ PM'} ] },
+  { id:4, name:'তানভীর আহমেদ', designation:'সাপোর্ট টিম লিড', phone:'01655667788', email:'tanvir@somadhan.com', roleId:'support', photo:null, joined:'জানুয়ারি ২০২৬', actions:'১৮৯', bio:'ইউজার সাপোর্ট, চ্যাট মনিটরিং ও রিভিউ মডারেশন সামলান।', flagged:true, online:false, lastLogin:'৫ দিন আগে', device:'Chrome · Android', ip:'103.87.XX.XX',
+    sessions:[ {device:'Chrome · Android', location:'সিলেট, বাংলাদেশ', time:'৫ দিন আগে'} ] }
+];
+
+const PERMS = {
+  super:  ['সব মেনু ও ফাংশনে সম্পূর্ণ এক্সেস — কোনো সীমাবদ্ধতা নেই'],
+  kyc:    ['ইউজার/সলভার সার্চ — দেখুন', 'ইউজারগণ — দেখুন', 'কেওয়াইসি — দেখুন, অনুমোদন, রিজেক্ট, রিভোক', 'অ্যাক্টিভিটি লগ — দেখুন'],
+  finance:['পরিসংখ্যান ও চার্ট — দেখুন', 'উইথড্রয়াল — দেখুন, অনুমোদন, রিজেক্ট, মুছুন', 'Escrow — দেখুন, রিকনসাইল', 'অতিরিক্ত চার্জ — দেখুন, সেটলড মার্ক', 'লেনদেন হিস্ট্রি — দেখুন', 'অনলাইন গেটওয়ে লেনদেন — দেখুন'],
+  support:['চ্যাট মনিটরিং — দেখুন', 'বিজ্ঞপ্তি প্রেরণ — দেখুন, প্রেরণ', 'FAQ ম্যানেজমেন্ট — দেখুন, তৈরি, এডিট, মুছুন', 'রিভিউ মডারেশন — দেখুন, লুকান, মুছুন']
+};
+
+let selectedId = 1;
+let searchText = '';
+
+function initials(name){ return name.trim().split(' ').map(w=>w[0]).slice(0,2).join(''); }
+function adminById(id){ return admins.find(a=>a.id===id); }
+
+function renderAdminList(){
+  searchText = document.getElementById('adminSearch').value.trim().toLowerCase();
+  const box = document.getElementById('adminList');
+  const filtered = admins.filter(a => a.name.toLowerCase().includes(searchText) || a.designation.toLowerCase().includes(searchText));
+  if(filtered.length === 0){
+    box.innerHTML = `<div class="list-empty">কোনো এডমিন পাওয়া যায়নি।</div>`;
+    return;
+  }
+  box.innerHTML = filtered.map(a => {
+    const role = ROLES[a.roleId];
+    const avatarStyle = a.photo ? `style="background-image:url('${a.photo}')"` : '';
+    return `
+      <div class="admin-item ${a.id===selectedId?'active':''}" onclick="selectAdmin(${a.id})">
+        <div class="mini-avatar ${role.locked?'super':''}" ${avatarStyle}>${a.photo ? '' : initials(a.name)}</div>
+        <div class="admin-item-info">
+          <p class="admin-item-name">${a.name} ${a.flagged?'🚩':''}</p>
+          <p class="admin-item-desig">${a.designation}</p>
+        </div>
+        <span class="mini-badge ${role.locked?'badge-slate':'badge-orange'}">${role.name}</span>
+      </div>`;
+  }).join('');
+}
+
+function selectAdmin(id){ selectedId = id; renderAdminList(); renderProfile(); }
+
+function triggerPhotoUpload(){ document.getElementById('photoInput').click(); }
+
+function onPhotoChosen(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    adminById(selectedId).photo = e.target.result;
+    renderAdminList(); renderProfile();
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveProfile(){
+  const a = adminById(selectedId);
+  a.name = document.getElementById('inpName').value.trim() || a.name;
+  a.designation = document.getElementById('inpDesig').value.trim() || a.designation;
+  a.email = document.getElementById('inpEmail').value.trim();
+  a.bio = document.getElementById('inpBio').value.trim();
+  renderAdminList(); renderProfile();
+  const toast = document.getElementById('savedToast');
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'), 2000);
+}
+
+function renderProfile(){
+  const a = adminById(selectedId);
+  const role = ROLES[a.roleId];
+  const col = document.getElementById('profileCol');
+  const avatarStyle = a.photo ? `style="background-image:url('${a.photo}')"` : '';
+
+  col.innerHTML = `
+    <div class="card profile-card">
+      <div class="cover ${role.locked?'super':''}"></div>
+      <div class="profile-top">
+        <div class="avatar-wrap">
+          <div class="big-avatar ${role.locked?'super':''}" ${avatarStyle}>${a.photo ? '' : initials(a.name)}</div>
+          <button class="avatar-upload-btn" onclick="triggerPhotoUpload()" title="প্রোফাইল ছবি আপলোড করুন">📷</button>
+          <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="onPhotoChosen(this)">
+        </div>
+        <p class="avatar-hint">JPG/PNG, সর্বোচ্চ ২MB — বর্গাকার ছবি সবচেয়ে ভালো দেখাবে</p>
+        <div class="profile-namebar">
+          <div>
+            <p class="profile-name">${a.name}</p>
+            <p class="profile-desig">${a.designation}</p>
+          </div>
+          <span class="role-badge-lg ${role.locked?'badge-slate':'badge-orange'}">${role.locked?'🔒 ':''}${role.name}</span>
+        </div>
+        ${a.flagged ? `<div class="flag-banner">🚩 এই অ্যাকাউন্টটি সুপার অ্যাডমিন কর্তৃক <b>ফ্ল্যাগড</b> — সব মেনু দেখা যাচ্ছে কিন্তু কোনো অ্যাকশন (তৈরি/এডিট/মুছা ইত্যাদি) নেওয়া যাবে না, যতক্ষণ না ফ্ল্যাগ তুলে নেওয়া হয়।</div>` : ''}
+      </div>
+
+      <div class="profile-body">
+        <p class="section-title">মূল তথ্য</p>
+        <div class="form-grid">
+          <div class="field">
+            <label>পূর্ণ নাম <span class="req">*</span></label>
+            <input id="inpName" value="${a.name}" placeholder="যেমন: রাফি হোসেন">
+          </div>
+          <div class="field">
+            <label>পদবি <span class="req">*</span></label>
+            <input id="inpDesig" value="${a.designation}" placeholder="যেমন: কেওয়াইসি ম্যানেজার">
+          </div>
+          <div class="field">
+            <label>ফোন নম্বর</label>
+            <input value="${a.phone}" disabled>
+            <p class="field-note">অ্যাকাউন্ট তৈরির সময় নির্ধারিত — পরিবর্তনের জন্য সুপার অ্যাডমিনের সাথে যোগাযোগ করুন।</p>
+          </div>
+          <div class="field">
+            <label>ইমেইল</label>
+            <input id="inpEmail" type="email" value="${a.email}" placeholder="you@somadhan.com">
+          </div>
+        </div>
+
+        <p class="section-title">সম্পর্কে</p>
+        <div class="field">
+          <label>সংক্ষিপ্ত পরিচিতি</label>
+          <textarea id="inpBio" placeholder="নিজের দায়িত্ব সম্পর্কে ২-৩ লাইন লিখুন...">${a.bio}</textarea>
+        </div>
+
+        <p class="section-title">অ্যাকাউন্ট তথ্য</p>
+        <div class="stat-row">
+          <div class="stat-box"><div class="stat-num">${a.joined}</div><div class="stat-lbl">যোগদানের তারিখ</div></div>
+          <div class="stat-box"><div class="stat-num">${a.actions}</div><div class="stat-lbl">মোট অ্যাক্টিভিটি</div></div>
+          <div class="stat-box"><div class="stat-num">${role.locked?'সর্বোচ্চ':'সীমিত'}</div><div class="stat-lbl">অ্যাক্সেস লেভেল</div></div>
+        </div>
+
+        <p class="section-title">পদবি অনুযায়ী ফাংশন এক্সেস</p>
+        <p class="field-note" style="margin:-4px 0 10px;">এই তালিকা রোল ম্যানেজমেন্ট থেকে নির্ধারিত — এখান থেকে পরিবর্তন করা যাবে না, শুধু রোল এডিট করে পরিবর্তন করা যায়।</p>
+        <div class="perm-grid">
+          ${PERMS[a.roleId].map(p => `<span class="perm-chip">✓ ${p}</span>`).join('')}
+        </div>
+
+        <p class="section-title">লগইন ও সেশন তথ্য</p>
+        <div class="login-info-grid">
+          <div class="login-info-box">
+            <div class="login-info-top"><span class="status-dot ${a.online?'online':'offline'}"></span><b>${a.online ? 'এই মুহূর্তে অনলাইন' : 'অফলাইন'}</b></div>
+            <p class="login-info-line">সর্বশেষ লগইন: <b>${a.lastLogin}</b></p>
+            <p class="login-info-line">ডিভাইস: ${a.device}</p>
+            <p class="login-info-line">আইপি অ্যাড্রেস: ${a.ip}</p>
+          </div>
+          <div class="session-list">
+            <p class="field-note" style="margin:0 0 6px;font-weight:600;color:var(--text-secondary);">সাম্প্রতিক সেশন</p>
+            ${a.sessions.map(s => `
+              <div class="session-row">
+                <span>📱</span>
+                <div class="session-info">
+                  <p class="session-device">${s.device}</p>
+                  <p class="session-meta">${s.location} · ${s.time}</p>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>
+
+        <p class="section-title">সিকিউরিটি</p>
+        <div class="security-row">
+          <div class="security-item">
+            <div><b>টু-ফ্যাক্টর অথেন্টিকেশন (2FA)</b><p class="field-note" style="margin:2px 0 0;">SMS OTP দিয়ে অতিরিক্ত সুরক্ষা যোগ করুন</p></div>
+            <label class="toggle-switch"><input type="checkbox" ${a.id===1?'checked':''}><span class="toggle-slider"></span></label>
+          </div>
+          <div class="security-item">
+            <div><b>পাসওয়ার্ড</b><p class="field-note" style="margin:2px 0 0;">সর্বশেষ পরিবর্তন: ৩ মাস আগে</p></div>
+            <button class="btn btn-ghost btn-sm">পরিবর্তন করুন</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-footer">
+        <span class="save-note">নাম ও পদবি পরিবর্তন লাইভ প্রিভিউ ও অ্যাডমিন তালিকায় সাথে সাথে দেখাবে।</span>
+        <div class="btns">
+          <span class="saved-toast" id="savedToast">✓ সংরক্ষিত হয়েছে</span>
+          <button class="btn btn-ghost" onclick="renderProfile()">বাতিল</button>
+          <button class="btn btn-primary" onclick="saveProfile()">সংরক্ষণ করুন</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+renderAdminList();
+renderProfile();
+</script>
+</body>
+</html>
